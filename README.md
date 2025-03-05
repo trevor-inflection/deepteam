@@ -39,16 +39,14 @@
 Whether your application is implemented via RAG or fine-tuning, LangChain or LlamaIndex, DeepEval has you covered. With it, you can easily determine the optimal hyperparameters to improve your RAG pipeline, prevent prompt drifting, or even transition from OpenAI to hosting your own Llama3 with confidence.
 
 
-> [!IMPORTANT]
+> [!NOTE]
 > DeepTeam is powered by DeepEval.
 
 > Want to talk LLM safety and security vulnerabilities? [Come join our discord.](https://discord.com/invite/a3K9c8GRGt)
 
 <br />
 
-# 🔥 Metrics and Features
-
-> 🥳 You can now share DeepEval's test results on the cloud directly on [Confident AI](https://confident-ai.com?utm_source=GitHub)'s infrastructure
+# ⚠️ Metrics, Risks, and Vulnerabilities 🚨
 
 - Large variety of ready-to-use LLM evaluation metrics (all with explanations) powered by **ANY** LLM of your choice, statistical methods, or NLP models that runs **locally on your machine**:
     - G-Eval
@@ -98,16 +96,6 @@ Whether your application is implemented via RAG or fine-tuning, LangChain or Lla
   - Monitor & evaluate LLM responses in product to improve datasets with real-world data
   - Repeat until perfection
 
-> [!NOTE]
-> Confident AI is the DeepEval platform. Create an account [here.](https://app.confident-ai.com?utm_source=GitHub)
-
-<br />
-
-# 🔌 Integrations
-
-- 🦄 LlamaIndex, to [**unit test RAG applications in CI/CD**](https://docs.confident-ai.com/docs/integrations-llamaindex?utm_source=GitHub)
-- 🤗 Hugging Face, to [**enable real-time evaluations during LLM fine-tuning**](https://docs.confident-ai.com/docs/integrations-huggingface?utm_source=GitHub)
-
 <br />
 
 # 🚀 QuickStart
@@ -117,20 +105,8 @@ Let's pretend your LLM application is a RAG based customer support chatbot; here
 ## Installation
 
 ```
-pip install -U deepeval
+pip install -U deepteam
 ```
-
-## Create an account (highly recommended)
-
-Using the `deepeval` platform will allow you to generate sharable testing reports on the cloud. It is free, takes no additional code to setup, and we highly recommend giving it a try.
-
-To login, run:
-
-```
-deepeval login
-```
-
-Follow the instructions in the CLI to create an account, copy your API key, and paste it into the CLI. All test cases will automatically be logged (find more information on data privacy [here](https://docs.confident-ai.com/docs/data-privacy?utm_source=GitHub)).
 
 ## Writing your first test case
 
@@ -187,125 +163,6 @@ deepeval test run test_chatbot.py
 
 <br />
 
-## Evaluating Without Pytest Integration
-
-Alternatively, you can evaluate without Pytest, which is more suited for a notebook environment.
-
-```python
-from deepeval import evaluate
-from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.test_case import LLMTestCase
-
-answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.7)
-test_case = LLMTestCase(
-    input="What if these shoes don't fit?",
-    # Replace this with the actual output from your LLM application
-    actual_output="We offer a 30-day full refund at no extra costs.",
-    retrieval_context=["All customers are eligible for a 30 day full refund at no extra costs."]
-)
-evaluate([test_case], [answer_relevancy_metric])
-```
-
-## Using Standalone Metrics
-
-DeepEval is extremely modular, making it easy for anyone to use any of our metrics. Continuing from the previous example:
-
-```python
-from deepeval.metrics import AnswerRelevancyMetric
-from deepeval.test_case import LLMTestCase
-
-answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.7)
-test_case = LLMTestCase(
-    input="What if these shoes don't fit?",
-    # Replace this with the actual output from your LLM application
-    actual_output="We offer a 30-day full refund at no extra costs.",
-    retrieval_context=["All customers are eligible for a 30 day full refund at no extra costs."]
-)
-
-answer_relevancy_metric.measure(test_case)
-print(answer_relevancy_metric.score)
-# All metrics also offer an explanation
-print(answer_relevancy_metric.reason)
-```
-
-Note that some metrics are for RAG pipelines, while others are for fine-tuning. Make sure to use our docs to pick the right one for your use case.
-
-## Evaluating a Dataset / Test Cases in Bulk
-
-In DeepEval, a dataset is simply a collection of test cases. Here is how you can evaluate these in bulk:
-
-```python
-import pytest
-from deepeval import assert_test
-from deepeval.metrics import HallucinationMetric, AnswerRelevancyMetric
-from deepeval.test_case import LLMTestCase
-from deepeval.dataset import EvaluationDataset
-
-first_test_case = LLMTestCase(input="...", actual_output="...", context=["..."])
-second_test_case = LLMTestCase(input="...", actual_output="...", context=["..."])
-
-dataset = EvaluationDataset(test_cases=[first_test_case, second_test_case])
-
-@pytest.mark.parametrize(
-    "test_case",
-    dataset,
-)
-def test_customer_chatbot(test_case: LLMTestCase):
-    hallucination_metric = HallucinationMetric(threshold=0.3)
-    answer_relevancy_metric = AnswerRelevancyMetric(threshold=0.5)
-    assert_test(test_case, [hallucination_metric, answer_relevancy_metric])
-```
-
-```bash
-# Run this in the CLI, you can also add an optional -n flag to run tests in parallel
-deepeval test run test_<filename>.py -n 4
-```
-
-<br/>
-
-Alternatively, although we recommend using `deepeval test run`, you can evaluate a dataset/test cases without using our Pytest integration:
-
-```python
-from deepeval import evaluate
-...
-
-evaluate(dataset, [answer_relevancy_metric])
-# or
-dataset.evaluate([answer_relevancy_metric])
-```
-
-# LLM Evaluation With Confident AI
-
-The correct LLM evaluation lifecycle is only achievable with [the DeepEval platform](https://confident-ai.com?utm_source=Github). It allows you to:
-
-1. Curate/annotate evaluation datasets on the cloud
-2. Benchmark LLM app using dataset, and compare with previous iterations to experiment which models/prompts works best
-3. Fine-tune metrics for custom results
-4. Debug evaluation results via LLM traces
-5. Monitor & evaluate LLM responses in product to improve datasets with real-world data
-6. Repeat until perfection
-
-Everything on Confident AI, including how to use Confident is available [here](https://docs.confident-ai.com/confidnet-ai/confident-ai-introduction?utm_source=GitHub).
-
-To begin, login from the CLI:
-
-```bash
-deepeval login
-```
-
-Follow the instructions to log in, create your account, and paste your API key into the CLI.
-
-Now, run your test file again:
-
-```bash
-deepeval test run test_chatbot.py
-```
-
-You should see a link displayed in the CLI once the test has finished running. Paste it into your browser to view the results!
-
-![Demo GIF](assets/demo.gif)
-
-<br />
 
 # Contributing
 
