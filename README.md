@@ -34,7 +34,7 @@
     </a>
 </p>
 
-**DeepTeam** is a simple-to-use, open-source LLM red teaming framework, for security and safety testing large-language model systems. Deepteam incorporates the latest research to red team LLM systems such as RAG pipelines, agents, chatbots, and even just the LLM itself, using various techniques such as prompt injection, jailbreaking, ROT13 encoding, etc., using LLMs and various other NLP models that runs **locally on your machine**.
+**DeepTeam** is a simple-to-use, open-source LLM red teaming framework, for security and safety testing large-language model systems. Deepteam incorporates the latest research to red team LLM systems such as RAG pipelines, agents, chatbots, and even just the LLM itself, using customizable techniques such as prompt injection, jailbreaking, ROT13 encoding, etc. With DeepTeam, you can use any LLM including ones that run **locally on your machine**.
 
 Whether your LLM application is user-facing or not, DeepSeek or Claude, DeepTeam has you covered. With it, you can easily determine the security and and safet risks and vulnerability your LLM system possesses.
 
