@@ -34,9 +34,9 @@
     </a>
 </p>
 
-**DeepTeam** is a simple-to-use, open-source LLM red teaming framework, for security and safety testing large-language model systems. Deepteam incorporates the latest research to scan LLM systems such as RAG pipelines, agents, chatbots, and even just an LLM itself, using various techniques such as prompt injection, jailbreaking, ROT13 encoding, etc., and are evaluated on vulnerabilities such as bias, toxicity, PII leakage. DeepTeam uses LLMs and various other NLP models that runs **locally on your machine** for evaluation.
+**DeepTeam** is a simple-to-use, open-source LLM red teaming framework, for security and safety testing large-language model systems. Deepteam incorporates the latest research to red team LLM systems such as RAG pipelines, agents, chatbots, and even just the LLM itself, using various techniques such as prompt injection, jailbreaking, ROT13 encoding, etc., using LLMs and various other NLP models that runs **locally on your machine**.
 
-Whether your application is implemented via RAG or fine-tuning, LangChain or LlamaIndex, DeepEval has you covered. With it, you can easily determine the optimal hyperparameters to improve your RAG pipeline, prevent prompt drifting, or even transition from OpenAI to hosting your own Llama3 with confidence.
+Whether your LLM application is user-facing or not, DeepSeek or Claude, DeepTeam has you covered. With it, you can easily determine the security and and safet risks and vulnerability your LLM system possesses.
 
 
 > [!NOTE]
