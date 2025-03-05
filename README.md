@@ -59,42 +59,13 @@ Whether your LLM application is user-facing or not, DeepSeek or Claude, DeepTeam
     - Contextual Relevancy
     - RAGAS
   - **Agentic metrics:**
-    - Task Completion
-    - Tool Correctness
-  - **Others:**
-    - Hallucination
-    - Summarization
-    - Bias
-    - Toxicity
-  - **Conversational metrics:**
-    - Knowledge Retention
-    - Conversation Completeness
-    - Conversation Relevancy
-    - Role Adherence
-  - etc.
-- Build your own custom metrics that are automatically integrated with DeepEval's ecosystem.
-- Generate synthetic datasets for evaluation.
-- Integrates seamlessly with **ANY** CI/CD environment.
+
 - [Red team your LLM application](https://docs.confident-ai.com/docs/red-teaming-introduction) for 40+ safety vulnerabilities in a few lines of code, including:
   - Toxicity
   - Bias
   - SQL Injection
   - etc., using advanced 10+ attack enhancement strategies such as prompt injections.
-- Easily benchmark **ANY** LLM on popular LLM benchmarks in [under 10 lines of code.](https://docs.confident-ai.com/docs/benchmarks-introduction?utm_source=GitHub), which includes:
-  - MMLU
-  - HellaSwag
-  - DROP
-  - BIG-Bench Hard
-  - TruthfulQA
-  - HumanEval
-  - GSM8K
-- [100% integrated with Confident AI](https://confident-ai.com?utm_source=GitHub) for the full evaluation lifecycle:
-  - Curate/annotate evaluation datasets on the cloud
-  - Benchmark LLM app using dataset, and compare with previous iterations to experiment which models/prompts works best
-  - Fine-tune metrics for custom results
-  - Debug evaluation results via LLM traces
-  - Monitor & evaluate LLM responses in product to improve datasets with real-world data
-  - Repeat until perfection
+
 
 <br />
 
