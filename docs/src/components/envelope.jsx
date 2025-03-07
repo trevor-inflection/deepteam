@@ -11,7 +11,7 @@ function Envelope(props) {
                 <div className={styles.letterBorder}></div>
                 <div className={styles.letterTitle}>Delivered by</div>
                 <div className={styles.letterContentContainer}>
-                    <img src="/icons/logo.svg" style={{width: "30px", height: "30px"}}/>
+                    <img src="/icons/red-logo.svg" style={{width: "30px", height: "30px"}}/>
                     <div className={styles.letterContext}>
                     <span class="lexend-deca" style={{fontSize: "16px"}}>Confident AI</span>
                     </div>

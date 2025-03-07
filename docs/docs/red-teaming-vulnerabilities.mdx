@@ -9,8 +9,8 @@ sidebar_label: Introduction
 Vulnerabilities enable you to **specify which aspect of your LLM you wish to red-team**. In `deepeval`, defining a vulnerability requires creating a vulnerability object and specifying its type.
 
 ```python
-from deepeval.vulnerability import Bias
-from deepeval.vulnerability.bias import BiasType
+from deepteam.vulnerabilities import Bias
+from deepteam.vulnerabilities.bias import BiasType
 
 bias_religion_vulnerability = Bias(type=BiasType.RELIGION)
 ```

@@ -8,11 +8,9 @@ class HomeNav extends React.Component {
     render() {
         return <div className={styles.homeNav}>
             <div><Link to={"/docs/getting-started"}>Docs</Link></div>
-            <div><Link to="/confident-ai/confident-ai-introduction">Confident AI</Link></div>
-            <div><Link to="/tutorials/tutorial-introduction">Tutorial</Link></div>
             <div><Link to="/guides/guides-rag-evaluation">Guides</Link></div>
             <div className={styles.canHide}>
-              <div><a href="https://github.com/confident-ai/deepeval" target="_blank">Github</a></div>
+              <div><a href="https://github.com/confident-ai/deepteam" target="_blank">Github</a></div>
               <div><a href="https://confident-ai.com/blog" target="_blank">Blog</a></div>
             </div>
         </div>
@@ -33,7 +31,7 @@ class ConfidentEnvelope extends React.Component {
           <div className={styles.letterBorder}></div>
           <div className={styles.letterTitle}>Delivered by</div>
           <div className={styles.letterContentContainer}>
-            <img src="icons/logo.svg" style={{width: "30px", height: "30px"}}/>
+            <img src="icons/red-logo.svg" style={{width: "30px", height: "30px"}}/>
             <div className={styles.letterContext}>
               <span class="lexend-deca" style={{fontSize: "16px"}}>Confident AI</span>
             </div>
@@ -79,15 +77,15 @@ class Index extends React.Component {
         <div className={styles.mainMainContainer}>
           <div className={styles.mainContainer}>
             <div className={styles.mainLeftContainer}>
-              <img src="icons/DeepEval.svg" />
+              <img src="icons/DeepTeam.svg" />
               <div className={styles.contentContainer}>
-                <h1>$ the open-source LLM evaluation framework</h1>
+                <h1>{`> the open-source LLM red teaming framework_`}</h1>
                 <div className={styles.ctaContainer}>
                   <Link to={"/docs/getting-started"} className={styles.button}>Get Started</Link>
-                  <a href={"https://confident-ai.com"} className={styles.confidentLink}>
-                    <span>Try the DeepEval Platform</span>
+                  {/* <a href={"https://confident-ai.com"} className={styles.confidentLink}>
+                    <span>Try the DeepTeam Platform</span>
                     <img className={styles.newTabIcon} src="icons/new-tab.svg"/>
-                  </a>
+                  </a> */}
                 </div>
               </div>
             </div>
@@ -95,19 +93,19 @@ class Index extends React.Component {
           </div>
           <div className={styles.featuresContainer}>
             <FeatureCard 
-                title="Regression Testing for LLMs" 
-                link="/docs/evaluation-test-cases" 
-                description="LLM evaluation metrics to unit test LLM outputs in Python"
+                title="Detect LLM Vulnerabilities"
+                link="/docs/red-teaming-vulnerabilities" 
+                description="Automatically scan for vulnerabilities such as bias, PII leakage, toxicity, etc."
             />
             <FeatureCard 
-                title="Prompt and Model Discovery"
-                link="/docs/getting-started#visualize-your-results" 
-                description="Gain insights to quickly iterate towards optimal prompts and model"
+                title="SOTA Adersarial Attacks" 
+                link="/docs/red-teaming-attack-enhancements" 
+                description="Prompt injections, gray box, etc. to jailbreak your LLM"
             />
-            <FeatureCard 
-                title="LLM Red Teaming" 
-                link="/docs/red-teaming-introduction" 
-                description="Security and safety test LLM applications for vulnerabilities"
+            <FeatureCard
+                title="OWASP Top 10, NIST AI, etc." 
+                link="/docs/red-teaming-owasp" 
+                description="OWASP Top 10, NIST AI, and so much more out of the box"
             />
           </div>
         </div>

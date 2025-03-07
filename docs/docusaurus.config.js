@@ -18,46 +18,20 @@ module.exports = {
     [
       "@docusaurus/plugin-content-docs",
       {
-        id: "tutorials",
-        path: "tutorials",
-        routeBasePath: "tutorials", 
-        sidebarPath: require.resolve("./sidebarTutorials.js"), 
-        editUrl:
-          "https://github.com/confident-ai/deepeval/edit/main/docs/",
-        showLastUpdateAuthor: true,
-        showLastUpdateTime: true,
-      },
-    ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "confident-ai", 
-        path: "confident-ai",
-        routeBasePath: "confident-ai",
-        sidebarPath: require.resolve("./sidebarConfidentAI.js"), 
-        editUrl:
-          "https://github.com/confident-ai/deepeval/edit/main/docs/",
-        showLastUpdateAuthor: true,
-        showLastUpdateTime: true,
-      },
-    ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
         id: "guides", 
         path: "guides",
         routeBasePath: "guides",
         sidebarPath: require.resolve("./sidebarGuides.js"), 
         editUrl:
-          "https://github.com/confident-ai/deepeval/edit/main/docs/",
+          "https://github.com/confident-ai/deepteam/edit/main/docs/",
         showLastUpdateAuthor: true,
         showLastUpdateTime: true,
       },
     ],
   ],
 
-  title: "DeepEval - The Open-Source LLM Evaluation Framework",
-  tagline: "Evaluation Framework for LLMs",
+  title: "DeepTeam - The Open-Source LLM Red Teaming Framework",
+  tagline: "Red Teaming Framework for LLMs",
   favicon: "img/fav.ico",
 
   // Set the production url of your site here
@@ -84,7 +58,7 @@ module.exports = {
         docs: {
           path: "docs",
           editUrl:
-            "https://github.com/confident-ai/deepeval/edit/main/docs/",
+            "https://github.com/confident-ai/deepteam/edit/main/docs/",
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
           sidebarPath: require.resolve("./sidebars.js"),
@@ -127,8 +101,8 @@ module.exports = {
       image: "img/social_card.png",
       navbar: {
         logo: {
-          alt: "DeepEval Logo",
-          src: "icons/DeepEval.svg",
+          alt: "DeepTeam Logo",
+          src: "icons/DeepTeam.svg",
         },
         items: [
           {
@@ -136,18 +110,6 @@ module.exports = {
             position: "left",
             label: "Docs",
             activeBasePath: 'docs',
-          },
-          {
-            to: "confident-ai/confident-ai-introduction",
-            position: "left",
-            label: "Confident AI",
-            activeBasePath: 'confident-ai',
-          },
-          {
-            to: "tutorials/tutorial-introduction",
-            position: "left",
-            label: "Tutorials",
-            activeBasePath: 'tutorials',
           },
           {
             to: "guides/guides-rag-evaluation",
@@ -164,7 +126,7 @@ module.exports = {
             href: "https://confident-ai.com",
             className: "header-confident-link",
             position: "right",
-            label: 'Try DeepEval Cloud',
+            label: 'Try DeepTeam Cloud',
           },
           {
             href: "https://discord.gg/a3K9c8GRGt",
@@ -172,7 +134,7 @@ module.exports = {
             position: "right",
           },
           {
-            href: "https://github.com/confident-ai/deepeval",
+            href: "https://github.com/confident-ai/deepteam",
             position: "right",
             className: "header-github-link",
           },
@@ -185,16 +147,16 @@ module.exports = {
         contextualSearch: true,
       },
       colorMode: {
-        defaultMode: "light",
+        defaultMode: "dark",
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
       announcementBar: {
         id: "announcementBar-1",
         content:
-          '⭐️ If you like DeepEval, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/confident-ai/deepeval">GitHub</a>! ⭐️',
-        backgroundColor: "#fff",
-        textColor: "#091E42",
+          '⭐️ If you like DeepTeam, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/confident-ai/deepteam">GitHub</a>! ⭐️',
+        backgroundColor: "#fc3287",
+        textColor: "#000",
       },
       footer: {
         style: "dark",
@@ -205,11 +167,6 @@ module.exports = {
               {
                 label: "Introduction",
                 to: "/docs/getting-started",
-              },
-              {label: "Confident AI", to: "/confident-ai/confident-ai-introduction"},
-              {
-                label: "Tutorials",
-                to: "/tutorials/tutorial-introduction",
               },
               {
                 label: "Guides",
@@ -234,7 +191,7 @@ module.exports = {
             items: [
               {
                 label: "GitHub",
-                to: "https://github.com/confident-ai/deepeval",
+                to: "https://github.com/confident-ai/deepteam",
               },
               {
                 label: "Discord",
