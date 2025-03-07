@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
     <img src="https://github.com/confident-ai/deepteam/blob/main/docs/static/img/deepteam.png" alt="DeepTeam Logo" width="100%">
 </p>
@@ -158,3 +159,5 @@ Built by the founders of Confident AI. Contact jeffreyip@confident-ai.com for al
 # License
 
 DeepTeam is licensed under Apache 2.0 - see the [LICENSE.md](https://github.com/confident-ai/deepeval/blob/main/LICENSE.md) file for details.
+=======
+>>>>>>> 27395ab (big changes)

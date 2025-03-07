@@ -72,7 +72,7 @@
     bottom: 0;
     width: 200px;
     height: 100px;
-    background: #7c3aed;
+    background: #ff2563;
     z-index: 0;
 }
 .animatedMail .leftFold {
@@ -92,7 +92,7 @@
     width: 160px;
     height: 60px;
     background: white;
-    border: 1px solid #7c3aed;
+    border: 1px solid #FF0059;
     z-index: 1;
     overflow: hidden;
     -webkit-transition: 0.4s 0.2s;
@@ -103,7 +103,7 @@
 .animatedMail .letter .letterBorder {
     height: 10px;
     width: 100%;
-    background: repeating-linear-gradient(-45deg, #7c3aed, #6e49dc 8px, transparent 8px, transparent 18px);
+    background: repeating-linear-gradient(-45deg, #FF0059, #FF0059 8px, transparent 8px, transparent 18px);
 }
 .animatedMail .letter .letterTitle {
     margin-top: 7px;

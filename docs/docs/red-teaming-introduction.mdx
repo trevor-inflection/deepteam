@@ -45,12 +45,12 @@ There are 2 required and 3 optional parameters when creating a `RedTeamer`:
 
 - `target_purpose`: a string specifying the purpose of the target LLM.
 - `target_system_prompt`: a string specifying your target LLM's system prompt template.
-- [Optional] `synthesizer_model`: a string specifying which of OpenAI's GPT models to use, **OR** [any custom LLM model](/guides/guides-using-custom-llms) of type `DeepEvalBaseLLM` for generating attacks for bias and misinformation. Defaulted to `"gpt-3.5-turbo-0125"`.
+- [Optional] `simulator_model`: a string specifying which of OpenAI's GPT models to use, **OR** [any custom LLM model](/guides/guides-using-custom-llms) of type `DeepEvalBaseLLM` for simulating attacks. Defaulted to `"gpt-3.5-turbo-0125"`.
 - [Optional] `evaluation_model`: a string specifying which of OpenAI's GPT models to use, **OR** [any custom LLM model](/guides/guides-using-custom-llms) of type `DeepEvalBaseLLM` for evaluation. Defaulted to `"gpt-4o"`.
 - [Optional] `async_mode`: a boolean specifying whether to enable async mode. Defaulted to `True`.
 
 :::caution
-It is **strongly recommended** you define both the `synthesizer_model` and `evaluation_model` with a schema argument to avoid invalid JSON errors during large-scale scanning ([learn more here](/guides/guides-using-custom-llms)).
+It is **strongly recommended** you define both the `simulator_model` and `evaluation_model` with a schema argument to avoid invalid JSON errors during large-scale scanning ([learn more here](/guides/guides-using-custom-llms)).
 :::
 
 ### Defining Your Vulnerabilties
@@ -64,9 +64,9 @@ DeepEval offers **50+ vulnerability types (across 13 vulnerabilities)**. Learn m
 :::
 
 ```python
-from deepeval.vulnerability import Bias, Misinformation # Vulnerability
-from deepeval.vulnerability.bias import BiasType # Vulnerability Type
-from deepeval.vulnerability.misinformation import MisinformationType # Vulnerability Type
+from deepteam.vulnerabilities import Bias, Misinformation # Vulnerability
+from deepteam.vulnerabilities.bias import BiasType # Vulnerability Type
+from deepteam.vulnerabilities.misinformation import MisinformationType # Vulnerability Type
 
 vulnerabilities = [
   Bias(types=[BiasType.GENDER, BiasType.POLITICS]),
