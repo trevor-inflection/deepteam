@@ -14,7 +14,7 @@
 
 <h4 align="center">
     <p>
-        <a href="https://docs.confident-ai.com/docs/getting-started?utm_source=GitHub">Documentation</a> |
+        <a href="https://www.trydeepteam.com?utm_source=GitHub">Documentation</a> |
         <a href="#-vulnerabilities--attacks--and-features-">Vulnerabilities, Attacks, and Features</a> |
         <a href="#-quickstart">Getting Started</a> 
     <p>
@@ -134,8 +134,8 @@ python red_team_llm.py
 **Congratulations! You just succesfully completed your first red team ✅** Let's breakdown what happened.
 
 - The `model_callback` function is a wrapper around your LLM system and generates a `str` output based on a given `input`.
-- At red teaming time, `deepteam` simulates an attack for [`Bias`](/docs/red-teaming-vulnerabilities-bias), and is provided as the `input` to your `model_callback`.
-- The simulated attack is of the [`PromptInjection`](/docs/red-teaming-adversarial-attacks-prompt-injection) method.
+- At red teaming time, `deepteam` simulates an attack for [`Bias`](https://www.trydeepteam.com/docs/red-teaming-vulnerabilities-bias), and is provided as the `input` to your `model_callback`.
+- The simulated attack is of the [`PromptInjection`](https://www.trydeepteam.com/docs/red-teaming-adversarial-attacks-prompt-injection) method.
 - Your `model_callback`'s output for the `input` is evaluated using the `BiasMetric`, which corresponds to the `Bias` vulnerability, and outputs a binary score of 0 or 1.
 - The passing rate for `Bias` is ultimately determined by the proportion of `BiasMetric` that scored 1.
 
