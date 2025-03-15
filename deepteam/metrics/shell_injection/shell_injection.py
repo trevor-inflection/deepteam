@@ -1,15 +1,11 @@
 from typing import Optional, List, Tuple, Union
 
-from deepteam.metrics import BaseRedTeamingMetric
 from deepeval.test_case import (
     LLMTestCase,
     LLMTestCaseParams,
     ConversationalTestCase,
 )
-from deepeval.metrics.red_teaming_metrics.shell_injection.template import (
-    ShellInjectionTemplate,
-)
-from deepeval.utils import get_or_create_event_loop, prettify_list
+from deepeval.utils import get_or_create_event_loop
 from deepeval.metrics.utils import (
     construct_verbose_logs,
     check_conversational_test_case_params,
@@ -19,15 +15,15 @@ from deepeval.metrics.utils import (
 )
 from deepeval.models import DeepEvalBaseLLM
 from deepeval.metrics.indicator import metric_progress_indicator
-from deepeval.metrics.red_teaming_metrics.debug_access.schema import *
 
-required_params: List[LLMTestCaseParams] = [
-    LLMTestCaseParams.INPUT,
-    LLMTestCaseParams.ACTUAL_OUTPUT,
-]
+from deepteam.metrics import BaseRedTeamingMetric
+from deepteam.metrics.debug_access.schema import *
+from deepteam.metrics.shell_injection.template import (
+    ShellInjectionTemplate,
+)
 
 
-class ShellInjectionGrader(BaseRedTeamingMetric):
+class ShellInjectionMetric(BaseRedTeamingMetric):
     def __init__(
         self,
         model: Optional[Union[str, DeepEvalBaseLLM]] = None,
@@ -44,7 +40,7 @@ class ShellInjectionGrader(BaseRedTeamingMetric):
     ) -> float:
         if isinstance(test_case, ConversationalTestCase):
             test_case = check_conversational_test_case_params(test_case, self)
-        check_llm_test_case_params(test_case, required_params, self)
+        check_llm_test_case_params(test_case, self._required_params, self)
 
         self.evaluation_cost = 0 if self.using_native_model else None
         with metric_progress_indicator(self, _show_indicator=False):
@@ -73,7 +69,7 @@ class ShellInjectionGrader(BaseRedTeamingMetric):
     ) -> float:
         if isinstance(test_case, ConversationalTestCase):
             test_case = check_conversational_test_case_params(test_case, self)
-        check_llm_test_case_params(test_case, required_params, self)
+        check_llm_test_case_params(test_case, self._required_params, self)
 
         self.evaluation_cost = 0 if self.using_native_model else None
         with metric_progress_indicator(

@@ -1,11 +1,23 @@
 from enum import Enum
+from typing import Literal
 
 
 class UnauthorizedAccessType(Enum):
-    BFLA = "Broken Function Level Authorization"
-    BOLA = "Broken Object Level Authorization"
-    RBAC = "Role-Based Access Control"
-    DEBUG_ACCESS = "Debug Access"
-    SHELL_INJECTION = "Shell Injection"
-    SQL_INJECTION = "SQL Injection"
-    SSRF = "Server Side Request Forgery"
+    BFLA = "bfla"
+    BOLA = "bola"
+    RBAC = "rbac"
+    DEBUG_ACCESS = "debug access"
+    SHELL_INJECTION = "shell injection"
+    SQL_INJECTION = "sql injection"
+    SSRF = "ssrf"
+
+
+UnauthorizedAccessTypes = Literal[
+    UnauthorizedAccessType.BFLA.value,
+    UnauthorizedAccessType.BOLA.value,
+    UnauthorizedAccessType.RBAC.value,
+    UnauthorizedAccessType.DEBUG_ACCESS.value,
+    UnauthorizedAccessType.SHELL_INJECTION.value,
+    UnauthorizedAccessType.SQL_INJECTION.value,
+    UnauthorizedAccessType.SSRF.value,
+]

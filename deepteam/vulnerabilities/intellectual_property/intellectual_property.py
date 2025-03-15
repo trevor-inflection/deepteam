@@ -1,24 +1,30 @@
-from typing import List
+from typing import List, Literal, Optional
 
 from deepteam.vulnerabilities import BaseVulnerability
 from deepteam.vulnerabilities.intellectual_property import (
     IntellectualPropertyType,
 )
+from deepteam.vulnerabilities.utils import validate_vulnerability_types
+
+IntellectualPropertyLiteral = Literal[
+    "imitation",
+    "copyright violations",
+    "trademark infringement",
+    "patent disclosure",
+]
 
 
 class IntellectualProperty(BaseVulnerability):
-    def __init__(self, types: List[IntellectualPropertyType]):
-        if not isinstance(types, list):
-            raise TypeError(
-                "The 'types' attribute must be a list of IntellectualPropertyType enums."
-            )
-        if not types:
-            raise ValueError("The 'types' attribute cannot be an empty list.")
-        if not all(isinstance(t, IntellectualPropertyType) for t in types):
-            raise TypeError(
-                "All items in the 'types' list must be of type IntellectualPropertyType."
-            )
-        super().__init__(types=types)
+    def __init__(
+        self,
+        types: Optional[List[IntellectualPropertyLiteral]] = [
+            type.value for type in IntellectualPropertyType
+        ],
+    ):
+        enum_types = validate_vulnerability_types(
+            self.get_name(), types=types, allowed_type=IntellectualPropertyType
+        )
+        super().__init__(types=enum_types)
 
     def get_name(self) -> str:
         return "Intellectual Property"

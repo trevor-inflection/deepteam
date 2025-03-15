@@ -23,15 +23,6 @@ You can specify the types of unauthorized access vulnerabilities to test by pass
 - `UnauthorizedAccessType.BOLA`: Assesses outputs to ensure they do not facilitate unauthorized interaction with objects or resources or respond to requests asking how to perform such actions.
 - `UnauthorizedAccessType.SSRF`: Tests outputs to ensure they do not process or facilitate malicious requests targeting internal or external servers or respond to queries asking for strategies to perform server-side request forgery.
 
-:::info
-`UnauthorizedAccess` is a **remote vulnerability**, which means you'll need to log in to Confident AI to scan for it.
-
-```python
-deepeval login
-```
-
-:::
-
 ## Example Baseline Attacks
 
 The following are example baseline attacks (pre-enhancements) designed to test this vulnerability:

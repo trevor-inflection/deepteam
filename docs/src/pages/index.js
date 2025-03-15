@@ -8,11 +8,13 @@ class HomeNav extends React.Component {
     render() {
         return <div className={styles.homeNav}>
             <div><Link to={"/docs/getting-started"}>Docs</Link></div>
-            <div><Link to="/guides/guides-rag-evaluation">Guides</Link></div>
-            <div className={styles.canHide}>
+            <div><a href="https://github.com/confident-ai/deepteam" target="_blank">Github</a></div>
+            <div><a href="https://confident-ai.com/blog" target="_blank">Blog</a></div>
+            {/* <div><Link to="/guides/guides-rag-evaluation">Guides</Link></div> */}
+            {/* <div className={styles.canHide}>
               <div><a href="https://github.com/confident-ai/deepteam" target="_blank">Github</a></div>
               <div><a href="https://confident-ai.com/blog" target="_blank">Blog</a></div>
-            </div>
+            </div> */}
         </div>
     }
 }
@@ -93,19 +95,19 @@ class Index extends React.Component {
           </div>
           <div className={styles.featuresContainer}>
             <FeatureCard 
-                title="Detect LLM Vulnerabilities"
+                title="Detect 40+ LLM Vulnerabilities"
                 link="/docs/red-teaming-vulnerabilities" 
                 description="Automatically scan for vulnerabilities such as bias, PII leakage, toxicity, etc."
             />
             <FeatureCard 
-                title="SOTA Adersarial Attacks" 
-                link="/docs/red-teaming-attack-enhancements" 
+                title="SOTA Adersarial Attacks"
+                link="/docs/red-teaming-adversarial-attacks" 
                 description="Prompt injections, gray box, etc. to jailbreak your LLM"
             />
             <FeatureCard
                 title="OWASP Top 10, NIST AI, etc." 
-                link="/docs/red-teaming-owasp" 
-                description="OWASP Top 10, NIST AI, and so much more out of the box"
+                link="/docs/red-teaming-owasp-top-10-for-llms" 
+                description="OWASP Top 10 for LLMs, NIST AI, and so much more out of the box"
             />
           </div>
         </div>

@@ -1,12 +1,12 @@
 ---
 id: red-teaming-vulnerabilities
-title: LLM Risks & Vulnerabilities
+title: Introduction
 sidebar_label: Introduction
 ---
 
-## Vulnerabilities
+## Quick Summary
 
-Vulnerabilities enable you to **specify which aspect of your LLM you wish to red-team**. In `deepeval`, defining a vulnerability requires creating a vulnerability object and specifying its type.
+Vulnerabilities enable you to **specify which aspect of your LLM you wish to red-team**. In `deepteam`, defining a vulnerability requires creating a vulnerability object and specifying its type.
 
 ```python
 from deepteam.vulnerabilities import Bias
@@ -19,7 +19,7 @@ bias_religion_vulnerability = Bias(type=BiasType.RELIGION)
 Each vulnerability accepts an `ENUM` specific to that vulnerability. For example, `Bias` accepts `BiasType`, which includes categories such as gender, religion, racial, and political biases.
 :::
 
-`deepeval` lets you scan for **13 different vulnerabilties** (which amounts to a combined 50+ vulnerability types), ensuring comprehensive coverage of potential risks within your LLM application. These vulnerabilities include:
+`deepteam` lets you scan for **13 different vulnerabilties** (which amounts to a combined 50+ vulnerability types), ensuring comprehensive coverage of potential risks within your LLM application. These vulnerabilities include:
 
 - [Bias](red-teaming-vulnerabilities-bias)
 - [Misinformation](red-teaming-vulnerabilities-misinformation)
@@ -35,23 +35,14 @@ Each vulnerability accepts an `ENUM` specific to that vulnerability. For example
 - [Graphic Content](red-teaming-vulnerabilities-personal-safety)
 - [Personal Safety](red-teaming-vulnerabilities-personal-safety)
 
-:::note
-DeepEval allows you to locally generate attacks for Bias and Misinformation. To scan your LLM for the remaining vulnerabilities, you'll need to **log in to Confident AI**. Use the following command to log in:
-
-```bash
-deepeval login
-:::
-
 ## LLM Risks
 
 LLM vulnerabilities can be categorized into 5 major LLM risk categories. Think of these categories simply as collections of vulnerabilities.
 
-
-| LLM Risk                  | Vulnerabilities                                                                                                                                               | Description                                                                                                                                                   |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Responsible AI Risks      | `Bias`, `Toxicity`                                                                                                                                                | Responsible AI vulnerabilities focus on ensuring that the model behaves ethically and responsibly without generating biased or offensive content.             |
-| Illegal Activities Risks  | `IllegalActivity`, `GraphicContent`, `PersonalSafety`                                                                                                          | Illegal Activities Risks involve vulnerabilities that encourage the model to generate content that breaks the law or promotes criminal behavior.              |
-| Brand Image Risks         | `ExcessiveAgency`, `Robustness`, `Competition`, `IntellectualProperty`                                                                                              | Brand Image Risks involve vulnerabilities that can harm the perception of an organization or brand by spreading incorrect, misleading information, or competition-related content. These risks can undermine trust, damage reputation, and lead to long-term consequences for brand credibility. |
-| Data Privacy Risks        | `PIILeakage`, `PromptLeakage`                                                                                                                                   | Data Privacy Risks involve vulnerabilities that expose confidential information or personal data, leading to potential privacy violations.                    |
-| Unauthorized Access Risks | `UnauthorizedAccess`                                                                                                                                           | Unauthorized Access Risks involve vulnerabilities that could allow attackers to exploit the LLM to gain unauthorized system access or execute unintended commands. |
-```
+| LLM Risk                  | Vulnerabilities                                                        | Description                                                                                                                                                                                                                                                                                      |
+| ------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Responsible AI Risks      | `Bias`, `Toxicity`                                                     | Responsible AI vulnerabilities focus on ensuring that the model behaves ethically and responsibly without generating biased or offensive content.                                                                                                                                                |
+| Illegal Activities Risks  | `IllegalActivity`, `GraphicContent`, `PersonalSafety`                  | Illegal Activities Risks involve vulnerabilities that encourage the model to generate content that breaks the law or promotes criminal behavior.                                                                                                                                                 |
+| Brand Image Risks         | `ExcessiveAgency`, `Robustness`, `Competition`, `IntellectualProperty` | Brand Image Risks involve vulnerabilities that can harm the perception of an organization or brand by spreading incorrect, misleading information, or competition-related content. These risks can undermine trust, damage reputation, and lead to long-term consequences for brand credibility. |
+| Data Privacy Risks        | `PIILeakage`, `PromptLeakage`                                          | Data Privacy Risks involve vulnerabilities that expose confidential information or personal data, leading to potential privacy violations.                                                                                                                                                       |
+| Unauthorized Access Risks | `UnauthorizedAccess`                                                   | Unauthorized Access Risks involve vulnerabilities that could allow attackers to exploit the LLM to gain unauthorized system access or execute unintended commands.                                                                                                                               |

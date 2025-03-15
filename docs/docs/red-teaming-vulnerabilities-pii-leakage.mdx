@@ -20,15 +20,6 @@ You can specify the types of PII leakage vulnerabilities to test by passing a li
 - `PIILeakageType.SESSION_LEAK`: Tests for outputs that disclose PII from other users' active or past sessions, such as inadvertently exposing personal details associated with session-based interactions.
 - `PIILeakageType.SOCIAL_MANIPULATION`: Tests for outputs that enable or facilitate social engineering attacks, tricking individuals into revealing their own or others' PII.
 
-:::info
-`PIILeakage` is a **remote vulnerability**, which means you'll need to log in to Confident AI to scan for it.
-
-```python
-deepeval login
-```
-
-:::
-
 ## Example Baseline Attacks
 
 The following are example baseline attacks (pre-enhancements) designed to test this vulnerability:

@@ -1,7 +1,6 @@
 from enum import Enum
-from typing import Dict, Type
+from typing import Dict
 
-from deepteam.vulnerabilities import BaseVulnerability
 from deepteam.vulnerabilities.types import *
 
 
@@ -14,29 +13,51 @@ class LLMRiskCategories(Enum):
 
 
 def getRiskCategory(
-    vulnerability: Type[BaseVulnerability],
+    vulnerability_type: VulnerabilityType,
 ) -> LLMRiskCategories:
-    risk_category_map: Dict[Type[BaseVulnerability], LLMRiskCategories] = {
-        #### Responsible AI ####
-        BiasType: LLMRiskCategories.RESPONSIBLE_AI,
-        ToxicityType: LLMRiskCategories.RESPONSIBLE_AI,
-        #### Illegal ####
-        IllegalActivityType: LLMRiskCategories.ILLEGAL,
-        GraphicContentType: LLMRiskCategories.ILLEGAL,
-        PersonalSafetyType: LLMRiskCategories.ILLEGAL,
-        #### Brand Image ####
-        MisinformationType: LLMRiskCategories.BRAND_IMAGE,
-        ExcessiveAgencyType: LLMRiskCategories.BRAND_IMAGE,
-        RobustnessType: LLMRiskCategories.BRAND_IMAGE,
-        IntellectualPropertyType: LLMRiskCategories.BRAND_IMAGE,
-        CompetitionType: LLMRiskCategories.BRAND_IMAGE,
-        #### Data Privacy ####
-        PromptLeakageType: LLMRiskCategories.DATA_PRIVACY,
-        PIILeakageType: LLMRiskCategories.DATA_PRIVACY,
-        #### Unauthorized Access ####
-        UnauthorizedAccessType: LLMRiskCategories.UNAUTHORIZED_ACCESS,
+    risk_category_map: Dict[VulnerabilityType, LLMRiskCategories] = {
+        # Responsible AI
+        **{bias: LLMRiskCategories.RESPONSIBLE_AI for bias in BiasType},
+        **{
+            toxicity: LLMRiskCategories.RESPONSIBLE_AI
+            for toxicity in ToxicityType
+        },
+        # Illegal
+        **{
+            illegal: LLMRiskCategories.ILLEGAL
+            for illegal in IllegalActivityType
+        },
+        **{
+            graphic: LLMRiskCategories.ILLEGAL for graphic in GraphicContentType
+        },
+        **{safety: LLMRiskCategories.ILLEGAL for safety in PersonalSafetyType},
+        # Brand Image
+        **{
+            misinfo: LLMRiskCategories.BRAND_IMAGE
+            for misinfo in MisinformationType
+        },
+        **{
+            agency: LLMRiskCategories.BRAND_IMAGE
+            for agency in ExcessiveAgencyType
+        },
+        **{robust: LLMRiskCategories.BRAND_IMAGE for robust in RobustnessType},
+        **{
+            ip: LLMRiskCategories.BRAND_IMAGE for ip in IntellectualPropertyType
+        },
+        **{comp: LLMRiskCategories.BRAND_IMAGE for comp in CompetitionType},
+        # Data Privacy
+        **{
+            prompt: LLMRiskCategories.DATA_PRIVACY
+            for prompt in PromptLeakageType
+        },
+        **{pii: LLMRiskCategories.DATA_PRIVACY for pii in PIILeakageType},
+        # Unauthorized Access
+        **{
+            unauth: LLMRiskCategories.UNAUTHORIZED_ACCESS
+            for unauth in UnauthorizedAccessType
+        },
     }
 
     return risk_category_map.get(
-        vulnerability, None
+        vulnerability_type, "Others"
     )  # Returns None if not found

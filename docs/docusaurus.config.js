@@ -6,29 +6,9 @@ const rehypeKatexModule = import("rehype-katex");
 
 module.exports = {
   plugins: [
-    [
-      "posthog-docusaurus",
-      {
-        apiKey: "phc_xuPeotBDIsi9uNBRS1ZqFD24IaOTx6lmt4ZCLfOnaee",
-        appUrl: "https://us.i.posthog.com",
-        enableInDevelopment: false,
-      },
-    ],
     "docusaurus-plugin-sass",
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "guides", 
-        path: "guides",
-        routeBasePath: "guides",
-        sidebarPath: require.resolve("./sidebarGuides.js"), 
-        editUrl:
-          "https://github.com/confident-ai/deepteam/edit/main/docs/",
-        showLastUpdateAuthor: true,
-        showLastUpdateTime: true,
-      },
-    ],
-  ],
+  ]
+  ,
 
   title: "DeepTeam - The Open-Source LLM Red Teaming Framework",
   tagline: "Red Teaming Framework for LLMs",
@@ -112,18 +92,12 @@ module.exports = {
             activeBasePath: 'docs',
           },
           {
-            to: "guides/guides-rag-evaluation",
-            position: "left",
-            label: "Guides",
-            activeBasePath: 'guides',
-          },
-          {
             href: "https://confident-ai.com/blog",
             position: "left",
             label: "Blogs",
           },
           {
-            href: "https://confident-ai.com",
+            href: "https://confident-ai.com/book-a-demo",
             className: "header-confident-link",
             position: "right",
             label: 'Try DeepTeam Cloud',
@@ -147,7 +121,7 @@ module.exports = {
         contextualSearch: true,
       },
       colorMode: {
-        defaultMode: "dark",
+        defaultMode: "light",
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
@@ -155,7 +129,7 @@ module.exports = {
         id: "announcementBar-1",
         content:
           '⭐️ If you like DeepTeam, give it a star on <a target="_blank" rel="noopener noreferrer" href="https://github.com/confident-ai/deepteam">GitHub</a>! ⭐️',
-        backgroundColor: "#fc3287",
+        backgroundColor: "#ff006b",
         textColor: "#000",
       },
       footer: {
@@ -168,26 +142,22 @@ module.exports = {
                 label: "Introduction",
                 to: "/docs/getting-started",
               },
-              {
-                label: "Guides",
-                to: "/guides/guides-rag-evaluation",
-              },
             ],
           },
           {
             title: "Articles You Must Read",
             items: [
               {
-                label: "LLM evaluation metrics",
-                to: "https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation",
+                label: "How to jailbreak LLMs",
+                to: "https://www.confident-ai.com/blog/how-to-jailbreak-llms-one-step-at-a-time",
               },
-              {label: "LLM-as-a-judge", to: "https://www.confident-ai.com/blog/why-llm-as-a-judge-is-the-best-llm-evaluation-method"},
-              {label: "LLM testing", to: "https://www.confident-ai.com/blog/llm-testing-in-2024-top-methods-and-strategies"},
-              {label: "LLM chatbot evaluation", to: "https://www.confident-ai.com/blog/llm-chatbot-evaluation-explained-top-chatbot-evaluation-metrics-and-testing-techniques"},
+              {label: "OWASP Top 10 for LLMs", to: "https://www.confident-ai.com/blog/owasp-top-10-2025-for-llm-applications-risks-and-mitigation-techniques"},
+              {label: "The comprehensive LLM safety guide", to: "https://www.confident-ai.com/blog/the-comprehensive-llm-safety-guide-navigate-ai-regulations-and-best-practices-for-llm-safety"},
+              {label: "LLM evaluation metrics", to: "https://www.confident-ai.com/blog/llm-evaluation-metrics-everything-you-need-for-llm-evaluation"},
             ],
           },
           {
-            title: "Evaluation Community",
+            title: "Red Teaming Community",
             items: [
               {
                 label: "GitHub",

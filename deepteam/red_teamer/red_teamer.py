@@ -1,14 +1,18 @@
 import asyncio
 from tqdm import tqdm
 from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+import inspect
 
 
-from deepeval.red_teaming.types import (
-    AttackEnhancement,
-    CallbackType,
-)
+from deepeval.models import DeepEvalBaseLLM
+from deepeval.metrics.utils import initialize_model
+from deepeval.dataset.golden import Golden
+from deepeval.test_case import LLMTestCase
+from deepeval.utils import get_or_create_event_loop
+from deepeval.telemetry import capture_red_teamer_run
 
+from deepteam.attacks import BaseAttack
 from deepteam.vulnerabilities import BaseVulnerability
 from deepteam.vulnerabilities.types import (
     IntellectualPropertyType,
@@ -26,187 +30,152 @@ from deepteam.vulnerabilities.types import (
     BiasType,
     VulnerabilityType,
 )
-from deepteam.attack_simulator import AttackSimulator, Attack
-from deepteam.metrics import BaseRedTeamingMetric
+from deepteam.attacks.attack_simulator import AttackSimulator, SimulatedAttack
+from deepteam.attacks.multi_turn.types import CallbackType
+from deepteam.metrics import (
+    BaseRedTeamingMetric,
+    BiasMetric,
+    HarmMetric,
+    PromptExtractionMetric,
+    PIIMetric,
+    RBACMetric,
+    DebugAccessMetric,
+    ShellInjectionMetric,
+    SQLInjectionMetric,
+    BFLAMetric,
+    BOLAMetric,
+    SSRFMetric,
+    ExcessiveAgencyMetric,
+    HijackingMetric,
+    IntellectualPropertyMetric,
+    OverrelianceMetric,
+    CompetitorsMetric,
+)
+from deepteam.red_teamer.utils import group_attacks_by_vulnerability_type
+from deepteam.red_teamer.risk_assessment import (
+    construct_risk_assessment_overview,
+    RedTeamingTestCase,
+    RiskAssessment,
+)
 from deepteam.risks import getRiskCategory
 
 
-from deepeval.models import DeepEvalBaseLLM
-from deepeval.metrics.utils import initialize_model
-
-
-from deepeval.dataset.golden import Golden
-from deepeval.test_case import LLMTestCase
-from deepeval.utils import get_or_create_event_loop
-from deepeval.telemetry import capture_red_teamer_run
-import inspect
-
-
-class VulnerabilityResult(BaseModel):
-    vulnerability: str
-    vulnerability_type: VulnerabilityType
-    attack_enhancement: Optional[str] = None
-    input: Optional[str] = None
-    actual_output: Optional[str] = None
-    score: Optional[int] = None
-    reason: Optional[str] = None
-    error: Optional[str] = None
-
-
-class RedTeamingTestCase(BaseModel):
-    vulnerability: str
-    risk_category: str = Field(alias="riskCategory")
-    input: Optional[str] = None
-    generated_output: Optional[str] = Field(
-        None, serialization_alias="actualOutput"
-    )
-    score: Optional[int] = None
-    reason: Optional[str] = None
-    error: Optional[str] = None
-    attack_enhancement: Optional[str] = Field(None, alias="attackEnhancement")
-
-
 class RedTeamer:
+    risk_assessment: Optional[RiskAssessment] = None
+    simulated_attacks: Optional[List[SimulatedAttack]] = None
+
     def __init__(
         self,
-        target_purpose: str,
-        target_system_prompt: str,
         simulator_model: Optional[
             Union[str, DeepEvalBaseLLM]
         ] = "gpt-3.5-turbo-0125",
         evaluation_model: Optional[Union[str, DeepEvalBaseLLM]] = "gpt-4o",
         async_mode: bool = True,
+        max_concurrent: int = 10,
     ):
-        self.target_purpose = target_purpose
-        self.target_system_prompt = target_system_prompt
+        self.target_purpose = ""
         self.simulator_model, _ = initialize_model(simulator_model)
         self.evaluation_model, _ = initialize_model(evaluation_model)
         self.async_mode = async_mode
         self.synthetic_goldens: List[Golden] = []
-
+        self.max_concurrent = max_concurrent
         self.attack_simulator = AttackSimulator(
             simulator_model=self.simulator_model,
             purpose=self.target_purpose,
-            system_prompt=self.target_system_prompt,
+            max_concurrent=max_concurrent,
         )
-
-    ##################################################
-    ### Scans ########################################
-    ##################################################
 
     def red_team(
         self,
-        target_model_callback: CallbackType,
-        attacks_per_vulnerability_type: int,
+        model_callback: CallbackType,
         vulnerabilities: List[BaseVulnerability],
-        attack_enhancements: Dict[AttackEnhancement, float] = {
-            AttackEnhancement.BASE64: 1 / 11,
-            AttackEnhancement.GRAY_BOX_ATTACK: 1 / 11,
-            AttackEnhancement.JAILBREAK_CRESCENDO: 1 / 11,
-            AttackEnhancement.JAILBREAK_LINEAR: 1 / 11,
-            AttackEnhancement.JAILBREAK_TREE: 1 / 11,
-            AttackEnhancement.LEETSPEAK: 1 / 11,
-            AttackEnhancement.PROMPT_INJECTION: 1 / 11,
-            AttackEnhancement.PROMPT_PROBING: 1 / 11,
-            AttackEnhancement.ROT13: 1 / 11,
-            AttackEnhancement.MATH_PROBLEM: 1 / 11,
-            AttackEnhancement.MULTILINGUAL: 1 / 11,
-        },
-        max_concurrent: int = 10,
+        attacks: List[BaseAttack],
+        attacks_per_vulnerability_type: int = 1,
         ignore_errors: bool = False,
+        reuse_simulated_attacks: bool = False,
     ):
         if self.async_mode:
             assert inspect.iscoroutinefunction(
-                target_model_callback
-            ), "`target_model_callback` needs to be async. `async_mode` has been set to True."
+                model_callback
+            ), "`model_callback` needs to be async. `async_mode` has been set to True."
             loop = get_or_create_event_loop()
             return loop.run_until_complete(
                 self.a_red_team(
-                    target_model_callback,
-                    attacks_per_vulnerability_type,
-                    vulnerabilities,
-                    attack_enhancements,
-                    max_concurrent,
+                    model_callback=model_callback,
+                    attacks_per_vulnerability_type=attacks_per_vulnerability_type,
+                    vulnerabilities=vulnerabilities,
+                    attacks=attacks,
                     ignore_errors=ignore_errors,
+                    reuse_simulated_attacks=reuse_simulated_attacks,
                 )
             )
         else:
             assert not inspect.iscoroutinefunction(
-                target_model_callback
-            ), "`target_model_callback` needs to be sync. `async_mode` has been set to False."
+                model_callback
+            ), "`model_callback` needs to be sync. `async_mode` has been set to False."
             with capture_red_teamer_run(
                 attacks_per_vulnerability_type=attacks_per_vulnerability_type,
                 vulnerabilities=vulnerabilities,
-                attack_enhancements=attack_enhancements,
+                attack_enhancements=attacks,
             ):
                 # Initialize metric map
                 metrics_map = self.get_red_teaming_metrics_map()
 
-                # Generate attacks
-                attacks: List[Attack] = self.attack_simulator.generate_attacks(
-                    target_model_callback=target_model_callback,
-                    attacks_per_vulnerability_type=attacks_per_vulnerability_type,
-                    vulnerabilities=vulnerabilities,
-                    attack_enhancements=attack_enhancements,
-                    ignore_errors=ignore_errors,
+                # Simulate attacks
+                if (
+                    reuse_simulated_attacks
+                    and self.simulated_attacks is not None
+                    and len(self.simulated_attacks) > 0
+                ):
+                    simulated_attacks: List[SimulatedAttack] = (
+                        self.simulated_attacks
+                    )
+                else:
+                    simulated_attacks: List[SimulatedAttack] = (
+                        self.attack_simulator.simulate(
+                            attacks_per_vulnerability_type=attacks_per_vulnerability_type,
+                            vulnerabilities=vulnerabilities,
+                            attacks=attacks,
+                            ignore_errors=ignore_errors,
+                        )
+                    )
+
+                vulnerability_type_to_attacks_map = (
+                    group_attacks_by_vulnerability_type(simulated_attacks)
                 )
-
-                # Create a mapping of vulnerabilities to attacks
-                vulnerability_to_attacks_map: Dict[
-                    VulnerabilityType, List[Attack]
-                ] = {}
-                for attack in attacks:
-                    if (
-                        attack.vulnerability_type
-                        not in vulnerability_to_attacks_map
-                    ):
-                        vulnerability_to_attacks_map[
-                            attack.vulnerability_type
-                        ] = [attack]
-                    else:
-                        vulnerability_to_attacks_map[
-                            attack.vulnerability_type
-                        ].append(attack)
-
-                # Evaluate each attack by vulnerability
                 red_teaming_test_cases: List[RedTeamingTestCase] = []
-                red_teaming_results_breakdown = []
-
-                num_vulnerability_types = sum(
+                total_vulnerability_types = sum(
                     len(v.get_types()) for v in vulnerabilities
                 )
                 pbar = tqdm(
-                    vulnerability_to_attacks_map.items(),
-                    desc=f"📝 Evaluating {num_vulnerability_types} vulnerability types across {len(vulnerabilities)} vulnerabilities",
+                    vulnerability_type_to_attacks_map.items(),
+                    desc=f"📝 Evaluating {total_vulnerability_types} vulnerability types across {len(vulnerabilities)} vulnerability(s)",
                 )
-                for vulnerability_type, attacks in pbar:
-                    scores = []
-                    for attack in attacks:
+                for vulnerability_type, simulated_attacks in pbar:
+                    for simulated_attack in simulated_attacks:
                         metric: BaseRedTeamingMetric = metrics_map.get(
                             vulnerability_type
                         )()
-                        risk = getRiskCategory(vulnerability_type)
+
                         red_teaming_test_case = RedTeamingTestCase(
-                            vulnerability=attack.vulnerability,
+                            vulnerability=simulated_attack.vulnerability,
                             vulnerability_type=vulnerability_type.value,
-                            attackEnhancement=attack.attack_enhancement,
-                            riskCategory=(
-                                risk.value if risk is not None else "Others"
-                            ),
-                            input=attack.input,
+                            attackMethod=simulated_attack.attack_method,
+                            riskCategory=getRiskCategory(vulnerability_type),
+                            input=simulated_attack.input,
                         )
 
                         # this will only go through if ignore_errors == True
-                        if attack.error:
-                            red_teaming_test_case.error = attack.error
+                        if simulated_attack.error:
+                            red_teaming_test_case.error = simulated_attack.error
                             red_teaming_test_cases.append(red_teaming_test_case)
                             continue
 
                         try:
-                            target_output = target_model_callback(attack.input)
-                            red_teaming_test_case.generated_output = (
-                                target_output
+                            target_output = model_callback(
+                                simulated_attack.input
                             )
+                            red_teaming_test_case.actual_output = target_output
                         except Exception:
                             if ignore_errors:
                                 red_teaming_test_case.error = (
@@ -220,15 +189,13 @@ class RedTeamer:
                                 raise
 
                         test_case = LLMTestCase(
-                            input=attack.input,
+                            input=simulated_attack.input,
                             actual_output=target_output,
                         )
-
                         try:
                             metric.measure(test_case)
                             red_teaming_test_case.score = metric.score
                             red_teaming_test_case.reason = metric.reason
-                            scores.append(metric.score)
                         except Exception:
                             if ignore_errors:
                                 red_teaming_test_case.error = f"Error evaluating target LLM output for the '{vulnerability_type.value}' vulnerability"
@@ -241,123 +208,99 @@ class RedTeamer:
 
                         red_teaming_test_cases.append(red_teaming_test_case)
 
-                    # # Calculate average score for each vulnerability
-                    # avg_vulnerability_score = (
-                    #     sum(scores) / len(scores) if scores else None
-                    # )
-                    # red_teaming_results.append(
-                    #     {
-                    #         "Vulnerability": attack.vulnerability,
-                    #         "Vulnerability Type": vulnerability_type.value,
-                    #         "Average Score": avg_vulnerability_score,
-                    #     }
-                    # )
+                self.risk_assessment = RiskAssessment(
+                    overview=construct_risk_assessment_overview(
+                        test_cases=red_teaming_test_cases
+                    ),
+                    test_cases=red_teaming_test_cases,
+                )
 
-                # # Convert results to pandas DataFrames
-                # df_results = pd.DataFrame(red_teaming_test_cases)
-                # df_breakdown = pd.DataFrame(red_teaming_results_breakdown)
-                # self.vulnerability_scores_breakdown = df_breakdown
-                # self.vulnerability_scores = df_results
-
-                return red_teaming_test_cases
+                self.save_test_cases_as_simulated_attacks(
+                    test_cases=red_teaming_test_cases
+                )
+                return self.risk_assessment
 
     async def a_red_team(
         self,
-        target_model_callback: CallbackType,
-        attacks_per_vulnerability_type: int,
+        model_callback: CallbackType,
         vulnerabilities: List[BaseVulnerability],
-        attack_enhancements: Dict[AttackEnhancement, float] = {
-            AttackEnhancement.BASE64: 1 / 11,
-            AttackEnhancement.GRAY_BOX_ATTACK: 1 / 11,
-            AttackEnhancement.JAILBREAK_CRESCENDO: 1 / 11,
-            AttackEnhancement.JAILBREAK_LINEAR: 1 / 11,
-            AttackEnhancement.JAILBREAK_TREE: 1 / 11,
-            AttackEnhancement.LEETSPEAK: 1 / 11,
-            AttackEnhancement.PROMPT_INJECTION: 1 / 11,
-            AttackEnhancement.PROMPT_PROBING: 1 / 11,
-            AttackEnhancement.ROT13: 1 / 11,
-            AttackEnhancement.MATH_PROBLEM: 1 / 11,
-            AttackEnhancement.MULTILINGUAL: 1 / 11,
-        },
-        max_concurrent: int = 10,  # Throttling limit, control concurrency
+        attacks: List[BaseAttack],
+        attacks_per_vulnerability_type: int = 1,
         ignore_errors: bool = False,
+        reuse_simulated_attacks: bool = False,
     ):
         with capture_red_teamer_run(
             attacks_per_vulnerability_type=attacks_per_vulnerability_type,
             vulnerabilities=vulnerabilities,
-            attack_enhancements=attack_enhancements,
+            attack_enhancements=attacks,
         ):
             # Initialize metric map
             metrics_map = self.get_red_teaming_metrics_map()
 
             # Generate attacks
-            attacks: List[Attack] = (
-                await self.attack_simulator.a_generate_attacks(
-                    target_model_callback=target_model_callback,
-                    attacks_per_vulnerability_type=attacks_per_vulnerability_type,
-                    vulnerabilities=vulnerabilities,
-                    attack_enhancements=attack_enhancements,
-                    ignore_errors=ignore_errors,
-                    max_concurrent=max_concurrent,
+            if (
+                reuse_simulated_attacks
+                and self.simulated_attacks is not None
+                and len(self.simulated_attacks) > 0
+            ):
+                simulated_attacks: List[SimulatedAttack] = (
+                    self.simulated_attacks
                 )
-            )
+            else:
+                simulated_attacks: List[SimulatedAttack] = (
+                    await self.attack_simulator.a_simulate(
+                        attacks_per_vulnerability_type=attacks_per_vulnerability_type,
+                        vulnerabilities=vulnerabilities,
+                        attacks=attacks,
+                        ignore_errors=ignore_errors,
+                    )
+                )
 
             # Create a mapping of vulnerabilities to attacks
             vulnerability_type_to_attacks_map: Dict[
-                VulnerabilityType, List[Attack]
+                VulnerabilityType, List[SimulatedAttack]
             ] = {}
-            for attack in attacks:
+            for simulated_attack in simulated_attacks:
                 if (
-                    attack.vulnerability_type
+                    simulated_attack.vulnerability_type
                     not in vulnerability_type_to_attacks_map
                 ):
                     vulnerability_type_to_attacks_map[
-                        attack.vulnerability_type
-                    ] = [attack]
+                        simulated_attack.vulnerability_type
+                    ] = [simulated_attack]
                 else:
                     vulnerability_type_to_attacks_map[
-                        attack.vulnerability_type
-                    ].append(attack)
+                        simulated_attack.vulnerability_type
+                    ].append(simulated_attack)
 
-            red_teaming_results = []
-            red_teaming_results_breakdown = []
-
-            # Create a semaphore for throttling concurrent tasks
-            semaphore = asyncio.Semaphore(max_concurrent)
-
-            # Total number of attacks across all vulnerabilities
+            semaphore = asyncio.Semaphore(self.max_concurrent)
             total_attacks = sum(
                 len(attacks)
                 for attacks in vulnerability_type_to_attacks_map.values()
             )
-            # Create a progress bar for attack evaluations
             num_vulnerability_types = sum(
                 len(v.get_types()) for v in vulnerabilities
             )
             pbar = tqdm(
                 total=total_attacks,
-                desc=f"📝 Evaluating {num_vulnerability_types} vulnerability types across {len(vulnerabilities)} vulnerabilities",
+                desc=f"📝 Evaluating {num_vulnerability_types} vulnerability types across {len(vulnerabilities)} vulnerability(s)",
             )
+
+            red_teaming_test_cases: List[RedTeamingTestCase] = []
 
             async def throttled_evaluate_vulnerability_type(
                 vulnerability_type, attacks
             ):
-                async with (
-                    semaphore
-                ):  # Ensures only `max_concurrent` run concurrently
-                    vulnerability_results = (
-                        await self._a_evaluate_vulnerability_type(
-                            target_model_callback,
-                            vulnerability_type,
-                            attacks,
-                            metrics_map,
-                            ignore_errors=ignore_errors,
-                        )
+                async with semaphore:
+                    test_cases = await self._a_evaluate_vulnerability_type(
+                        model_callback,
+                        vulnerability_type,
+                        attacks,
+                        metrics_map,
+                        ignore_errors=ignore_errors,
                     )
-                    pbar.update(
-                        len(attacks)
-                    )  # Update the progress bar by the number of attacks evaluated
-                    return vulnerability_results
+                    red_teaming_test_cases.extend(test_cases)
+                    pbar.update(len(attacks))
 
             # Create a list of tasks for evaluating each vulnerability, with throttling
             tasks = [
@@ -366,139 +309,92 @@ class RedTeamer:
                 )
                 for vulnerability_type, attacks in vulnerability_type_to_attacks_map.items()
             ]
-            # Execute tasks concurrently with throttling using asyncio.gather
-            vulnerability_results_list = await asyncio.gather(*tasks)
-
-            # Close the progress bar after all tasks are done
+            await asyncio.gather(*tasks)
             pbar.close()
 
-            # Process results
-            for (vulnerability_type, attacks), vulnerability_results in zip(
-                vulnerability_type_to_attacks_map.items(),
-                vulnerability_results_list,
-            ):
-                valid_scores = [
-                    vulnerability_result.score
-                    for vulnerability_result in vulnerability_results
-                    if vulnerability_result.score is not None
-                ]
-                if valid_scores:
-                    avg_score = sum(valid_scores) / len(valid_scores)
-                else:
-                    avg_score = None
-
-                red_teaming_results.append(
-                    {
-                        "Vulnerability": attacks[0].vulnerability,
-                        "Vulnerability Type": vulnerability_type,
-                        "Average Score": avg_score,
-                    }
-                )
-
-                for vulnerability_result in vulnerability_results:
-                    risk = getRiskCategory(
-                        vulnerability_result.vulnerability_type
-                    )
-                    red_teaming_results_breakdown.append(
-                        {
-                            "Vulnerability": vulnerability_result.vulnerability,
-                            "Vulnerability Type": vulnerability_result.vulnerability_type,
-                            "Attack Enhancement": vulnerability_result.attack_enhancement,
-                            "Risk Category": (
-                                risk.value if risk is not None else "Others"
-                            ),
-                            "Input": vulnerability_result.input,
-                            "Target Output": vulnerability_result.actual_output,
-                            "Score": vulnerability_result.score,
-                            "Reason": vulnerability_result.reason,
-                            "Error": vulnerability_result.error,
-                        }
-                    )
-
-            # Convert results to pandas DataFrames
-            red_teaming_results_df = pd.DataFrame(red_teaming_results)
-            red_teaming_results_breakdown_df = pd.DataFrame(
-                red_teaming_results_breakdown
+            self.risk_assessment = RiskAssessment(
+                overview=construct_risk_assessment_overview(
+                    test_cases=red_teaming_test_cases
+                ),
+                test_cases=red_teaming_test_cases,
             )
-            self.vulnerability_scores_breakdown = (
-                red_teaming_results_breakdown_df
+            self.save_test_cases_as_simulated_attacks(
+                test_cases=red_teaming_test_cases
             )
-            self.vulnerability_scores = red_teaming_results_df
-
-            return red_teaming_results_df
+            return self.risk_assessment
 
     async def _a_attack(
         self,
-        target_model_callback: CallbackType,
-        attack: Attack,
+        model_callback: CallbackType,
+        simulated_attack: SimulatedAttack,
         vulnerability: str,
         vulnerability_type: VulnerabilityType,
         metrics_map,
         ignore_errors: bool,
-    ) -> VulnerabilityResult:
-        result = VulnerabilityResult(
-            input=attack.input,
+    ) -> RedTeamingTestCase:
+        red_teaming_test_case = RedTeamingTestCase(
+            input=simulated_attack.input,
             vulnerability=vulnerability,
             vulnerability_type=vulnerability_type,
-            attack_enhancement=attack.attack_enhancement,
+            attack_method=simulated_attack.attack_method,
+            riskCategory=getRiskCategory(vulnerability_type),
         )
 
-        if attack.error is not None:
-            result.error = attack.error
-            return result
+        if simulated_attack.error is not None:
+            red_teaming_test_case.error = simulated_attack.error
+            return red_teaming_test_case
 
         metric: BaseRedTeamingMetric = metrics_map[vulnerability_type]()
         try:
-            # Generate actual output using the 'input'
-            actual_output = await target_model_callback(attack.input)
-            result.actual_output = actual_output
+            actual_output = await model_callback(simulated_attack.input)
+            red_teaming_test_case.actual_output = actual_output
         except Exception:
             if ignore_errors:
-                result.error = "Error generating output from target LLM"
-                return result
+                red_teaming_test_case.error = (
+                    "Error generating output from target LLM"
+                )
+                return red_teaming_test_case
             else:
                 raise
 
         test_case = LLMTestCase(
-            input=attack.input,
+            input=simulated_attack.input,
             actual_output=actual_output,
         )
-
         try:
             await metric.a_measure(test_case)
-            result.score = metric.score
-            result.reason = metric.reason
+            red_teaming_test_case.score = metric.score
+            red_teaming_test_case.reason = metric.reason
         except:
             if ignore_errors:
-                result.error = f"Error evaluating target LLM output for the '{vulnerability_type.value}' vulnerability type"
-                return result
+                red_teaming_test_case.error = f"Error evaluating target LLM output for the '{vulnerability_type.value}' vulnerability type"
+                return red_teaming_test_case
             else:
                 raise
-
-        return result
+        return red_teaming_test_case
 
     async def _a_evaluate_vulnerability_type(
         self,
-        target_model_callback: CallbackType,
+        model_callback: CallbackType,
         vulnerability_type: VulnerabilityType,
-        attacks: List[Attack],
+        simulated_attacks: List[SimulatedAttack],
         metrics_map,
         ignore_errors: bool,
-    ) -> List[VulnerabilityResult]:
-        results = await asyncio.gather(
+    ) -> List[RedTeamingTestCase]:
+        red_teaming_test_cases = await asyncio.gather(
             *[
                 self._a_attack(
-                    target_model_callback=target_model_callback,
-                    attack=attack,
-                    vulnerability=attack.vulnerability,
+                    model_callback=model_callback,
+                    simulated_attack=simulated_attack,
+                    vulnerability=simulated_attack.vulnerability,
                     vulnerability_type=vulnerability_type,
                     metrics_map=metrics_map,
                     ignore_errors=ignore_errors,
                 )
-                for attack in attacks
+                for simulated_attack in simulated_attacks
             ]
         )
-        return results
+        return red_teaming_test_cases
 
     ##################################################
     ### Metrics Map ##################################
@@ -508,7 +404,7 @@ class RedTeamer:
         metrics_map = {
             #### Bias ####
             **{
-                bias_type: lambda: BiasGrader(
+                bias_type: lambda: BiasMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -517,7 +413,7 @@ class RedTeamer:
             },
             #### Toxicity ####
             **{
-                toxicity_type: lambda tt=toxicity_type: HarmGrader(
+                toxicity_type: lambda tt=toxicity_type: HarmMetric(
                     model=self.evaluation_model,
                     harm_category=tt.value,
                     async_mode=self.async_mode,
@@ -526,7 +422,7 @@ class RedTeamer:
             },
             #### Misinformation ####
             **{
-                misinformation_type: lambda mt=misinformation_type: HarmGrader(
+                misinformation_type: lambda mt=misinformation_type: HarmMetric(
                     model=self.evaluation_model,
                     harm_category=mt.value,
                     async_mode=self.async_mode,
@@ -535,7 +431,7 @@ class RedTeamer:
             },
             #### Illegal ####
             **{
-                illegal_activity_type: lambda iat=illegal_activity_type: HarmGrader(
+                illegal_activity_type: lambda iat=illegal_activity_type: HarmMetric(
                     model=self.evaluation_model,
                     harm_category=iat.value,
                     async_mode=self.async_mode,
@@ -544,7 +440,7 @@ class RedTeamer:
             },
             #### Prompt Leakage ####
             **{
-                prompt_leakage_type: lambda: PromptExtractionGrader(
+                prompt_leakage_type: lambda: PromptExtractionMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -553,7 +449,7 @@ class RedTeamer:
             },
             #### PII Leakage ####
             **{
-                pii_type: lambda: PIIGrader(
+                pii_type: lambda: PIIMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -561,37 +457,37 @@ class RedTeamer:
                 for pii_type in PIILeakageType
             },
             #### Unauthorized Access ####
-            UnauthorizedAccessType.DEBUG_ACCESS: lambda: DebugAccessGrader(
+            UnauthorizedAccessType.DEBUG_ACCESS: lambda: DebugAccessMetric(
                 model=self.evaluation_model, async_mode=self.async_mode
             ),
-            UnauthorizedAccessType.RBAC: lambda: RBACGrader(
+            UnauthorizedAccessType.RBAC: lambda: RBACMetric(
                 model=self.evaluation_model,
                 purpose=self.target_purpose,
                 async_mode=self.async_mode,
             ),
-            UnauthorizedAccessType.SHELL_INJECTION: lambda: ShellInjectionGrader(
+            UnauthorizedAccessType.SHELL_INJECTION: lambda: ShellInjectionMetric(
                 model=self.evaluation_model, async_mode=self.async_mode
             ),
-            UnauthorizedAccessType.SQL_INJECTION: lambda: SQLInjectionGrader(
+            UnauthorizedAccessType.SQL_INJECTION: lambda: SQLInjectionMetric(
                 model=self.evaluation_model, async_mode=self.async_mode
             ),
-            UnauthorizedAccessType.BFLA: lambda: BFLAGrader(
+            UnauthorizedAccessType.BFLA: lambda: BFLAMetric(
                 purpose=self.target_purpose,
                 model=self.evaluation_model,
                 async_mode=self.async_mode,
             ),
-            UnauthorizedAccessType.BOLA: lambda: BOLAGrader(
+            UnauthorizedAccessType.BOLA: lambda: BOLAMetric(
                 model=self.evaluation_model,
                 async_mode=self.async_mode,
             ),
-            UnauthorizedAccessType.SSRF: lambda: SSRFGrader(
+            UnauthorizedAccessType.SSRF: lambda: SSRFMetric(
                 purpose=self.target_purpose,
                 model=self.evaluation_model,
                 async_mode=self.async_mode,
             ),
             #### Excessive Agency ####
             **{
-                excessive_agency_type: lambda: ExcessiveAgencyGrader(
+                excessive_agency_type: lambda: ExcessiveAgencyMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -599,19 +495,19 @@ class RedTeamer:
                 for excessive_agency_type in ExcessiveAgencyType
             },
             #### Robustness ####
-            RobustnessType.HIJACKING: lambda: HijackingGrader(
+            RobustnessType.HIJACKING: lambda: HijackingMetric(
                 purpose=self.target_purpose,
                 model=self.evaluation_model,
                 async_mode=self.async_mode,
             ),
-            RobustnessType.INPUT_OVERRELIANCE: lambda: OverrelianceGrader(
+            RobustnessType.INPUT_OVERRELIANCE: lambda: OverrelianceMetric(
                 purpose=self.target_purpose,
                 model=self.evaluation_model,
                 async_mode=self.async_mode,
             ),
             #### Intellectual Property ####
             **{
-                ip_type: lambda: IntellectualPropertyGrader(
+                ip_type: lambda: IntellectualPropertyMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -620,7 +516,7 @@ class RedTeamer:
             },
             #### Competition ####
             **{
-                competiton_type: lambda: CompetitorsGrader(
+                competiton_type: lambda: CompetitorsMetric(
                     model=self.evaluation_model,
                     purpose=self.target_purpose,
                     async_mode=self.async_mode,
@@ -629,7 +525,7 @@ class RedTeamer:
             },
             #### Graphic Content ####
             **{
-                content_type: lambda ct=content_type: HarmGrader(
+                content_type: lambda ct=content_type: HarmMetric(
                     model=self.evaluation_model,
                     harm_category=ct.value,
                     async_mode=self.async_mode,
@@ -638,7 +534,7 @@ class RedTeamer:
             },
             #### Personal Safety ####
             **{
-                safety_type: lambda st=safety_type: HarmGrader(
+                safety_type: lambda st=safety_type: HarmMetric(
                     model=self.evaluation_model,
                     harm_category=st.value,
                     async_mode=self.async_mode,
@@ -648,3 +544,20 @@ class RedTeamer:
         }
         self.metrics_map = metrics_map
         return metrics_map
+
+    def save_test_cases_as_simulated_attacks(
+        self, test_cases: List[RedTeamingTestCase]
+    ):
+        simulated_attacks: List[SimulatedAttack] = []
+        for test_case in test_cases:
+            if test_case.error or test_case.input is None:
+                continue
+            simulated_attack = SimulatedAttack(
+                vulnerability=test_case.vulnerability,
+                vulnerability_type=test_case.vulnerability_type,
+                input=test_case.input,
+                attack_method=test_case.attack_method,
+            )
+            simulated_attacks.append(simulated_attack)
+
+        self.simulated_attacks = simulated_attacks
