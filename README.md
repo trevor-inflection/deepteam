@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://github.com/confident-ai/deepteam/blob/main/docs/static/img/deepteam" alt="DeepTeam Logo" width="100%">
+    <img src="https://github.com/confident-ai/deepteam/blob/main/docs/static/img/deepteam.png" alt="DeepTeam Logo" width="100%">
 </p>
 
 <p align="center">
