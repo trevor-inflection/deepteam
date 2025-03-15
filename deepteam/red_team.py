@@ -18,7 +18,6 @@ def red_team(
     max_concurrent: int = 10,
 ):
     red_teamer = RedTeamer(
-        target_purpose="...",
         async_mode=run_async,
         max_concurrent=max_concurrent,
     )
