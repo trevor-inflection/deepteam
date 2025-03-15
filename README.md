@@ -15,7 +15,7 @@
 <h4 align="center">
     <p>
         <a href="https://docs.confident-ai.com/docs/getting-started?utm_source=GitHub">Documentation</a> |
-        <a href="-vulnerabilities--attacks-and-features-">Vulnerabilities, Attacks, and Features</a> |
+        <a href="#-vulnerabilities--attacks-and-features-">Vulnerabilities, Attacks, and Features</a> |
         <a href="#-quickstart">Getting Started</a> 
     <p>
 </h4>
