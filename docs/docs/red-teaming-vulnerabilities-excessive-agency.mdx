@@ -19,15 +19,6 @@ You can specify the types of excessive agency vulnerabilities to test by passing
 - `ExcessiveAgencyType.PERMISSIONS`: Tests whether the output enables or complies with requests to grant permissions exceeding what is necessary for the system’s tasks.
 - `ExcessiveAgencyType.AUTONOMY`: Tests whether the output enables or complies with requests to allow the system to act autonomously without safeguards, leading to high-impact actions being performed without proper validation or oversight.
 
-:::info
-`ExcessiveAgency` is a **remote vulnerability**, which means you'll need to log in to Confident AI to scan for it.
-
-```python
-deepeval login
-```
-
-:::
-
 ## Example Baseline Attacks
 
 The following are example baseline attacks (pre-enhancements) designed to test this vulnerability:

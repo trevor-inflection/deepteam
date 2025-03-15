@@ -1,22 +1,23 @@
-from typing import List
+from typing import List, Literal, Optional
 
 from deepteam.vulnerabilities import BaseVulnerability
 from deepteam.vulnerabilities.toxicity import ToxicityType
+from deepteam.vulnerabilities.utils import validate_vulnerability_types
+
+ToxicityLiteral = Literal["profanity", "insults", "threats", "mockery"]
 
 
 class Toxicity(BaseVulnerability):
-    def __init__(self, types: List[ToxicityType]):
-        if not isinstance(types, list):
-            raise TypeError(
-                "The 'types' attribute must be a list of ToxicityType enums."
-            )
-        if not types:
-            raise ValueError("The 'types' attribute cannot be an empty list.")
-        if not all(isinstance(t, ToxicityType) for t in types):
-            raise TypeError(
-                "All items in the 'types' list must be of type ToxicityType."
-            )
-        super().__init__(types=types)
+    def __init__(
+        self,
+        types: Optional[List[ToxicityLiteral]] = [
+            type.value for type in ToxicityType
+        ],
+    ):
+        enum_types = validate_vulnerability_types(
+            self.get_name(), types=types, allowed_type=ToxicityType
+        )
+        super().__init__(types=enum_types)
 
     def get_name(self) -> str:
         return "Toxicity"

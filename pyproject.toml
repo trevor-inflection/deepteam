@@ -24,6 +24,7 @@ black = "*"
 openai = "*"
 aiohttp = "*"
 twine="5.1.1"
+grpcio="1.67.1"
 
 [tool.black]
 line-length = 80

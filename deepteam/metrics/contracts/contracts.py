@@ -1,13 +1,9 @@
 from typing import Optional, List, Tuple, Union
 
-from deepteam.metrics import BaseRedTeamingMetric
 from deepeval.test_case import (
     LLMTestCase,
     LLMTestCaseParams,
     ConversationalTestCase,
-)
-from deepeval.metrics.red_teaming_metrics.contracts.template import (
-    ContractsTemplate,
 )
 from deepeval.utils import get_or_create_event_loop
 from deepeval.metrics.utils import (
@@ -18,15 +14,15 @@ from deepeval.metrics.utils import (
 )
 from deepeval.models import DeepEvalBaseLLM
 from deepeval.metrics.indicator import metric_progress_indicator
-from deepeval.metrics.red_teaming_metrics.debug_access.schema import *
 
-required_params: List[LLMTestCaseParams] = [
-    LLMTestCaseParams.INPUT,
-    LLMTestCaseParams.ACTUAL_OUTPUT,
-]
+from deepteam.metrics.contracts.template import (
+    ContractsTemplate,
+)
+from deepteam.metrics import BaseRedTeamingMetric
+from deepteam.metrics.debug_access.schema import *
 
 
-class ContractsGrader(BaseRedTeamingMetric):
+class ContractsMetric(BaseRedTeamingMetric):
     def __init__(
         self,
         model: Optional[Union[str, DeepEvalBaseLLM]] = None,
@@ -41,7 +37,7 @@ class ContractsGrader(BaseRedTeamingMetric):
     def measure(
         self, test_case: Union[LLMTestCase, ConversationalTestCase]
     ) -> float:
-        check_llm_test_case_params(test_case, required_params, self)
+        check_llm_test_case_params(test_case, self._required_params, self)
 
         self.evaluation_cost = 0 if self.using_native_model else None
         with metric_progress_indicator(self, _show_indicator=False):
@@ -68,7 +64,7 @@ class ContractsGrader(BaseRedTeamingMetric):
         test_case: Union[LLMTestCase, ConversationalTestCase],
         _show_indicator: bool = False,
     ) -> float:
-        check_llm_test_case_params(test_case, required_params, self)
+        check_llm_test_case_params(test_case, self._required_params, self)
 
         self.evaluation_cost = 0 if self.using_native_model else None
         with metric_progress_indicator(

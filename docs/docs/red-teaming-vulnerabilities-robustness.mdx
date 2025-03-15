@@ -18,15 +18,6 @@ You can specify the types of robustness vulnerabilities to test by passing a lis
 - `RobustnessType.INPUT_OVERRELIANCE`: Tests whether the output is excessively influenced by user input, leading to misleading and undesirable responses or behaviors that reflect user-provided content.
 - `RobustnessType.HIJACKING`: Tests whether the output enables or complies with malicious or crafted inputs that redirect or alter the system’s intended behavior.
 
-:::info
-`Robustness` is a **remote vulnerability**, which means you'll need to log in to Confident AI to scan for it.
-
-```python
-deepeval login
-```
-
-:::
-
 ## Example Baseline Attacks
 
 The following are example baseline attacks (pre-enhancements) designed to test this vulnerability:

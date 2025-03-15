@@ -6,7 +6,7 @@ sidebar_label: Introduction
 
 ## Quick Summary
 
-`deepeval`'s `RedTeamer` generates adversarial attacks by first synthesizing simple baseline prompts, before **progressively enhancing them to create more sophisticated versions** capable of eliciting harmful responses from your LLM application.
+`deepteam`'s `RedTeamer` generates adversarial attacks by first synthesizing simple baseline prompts, before **progressively enhancing them to create more sophisticated versions** capable of eliciting harmful responses from your LLM application.
 
 <div
   style={{
@@ -26,7 +26,7 @@ sidebar_label: Introduction
   />
 </div>
 
-You can specify these enhancements in `attack_enhancements` within the method function.
+You can specify these enhancements in `attack_methods` within the method function.
 
 ```python
 from deepeval.red_teaming import AttackEnhancement
@@ -34,7 +34,7 @@ from deepeval.red_teaming import AttackEnhancement
 
 results = red_teamer.scan(
     ...
-    attack_enhancements={
+    attack_methods={
         AttackEnhancement.BASE64: 0.2,
         AttackEnhancement.GRAY_BOX_ATTACK: 0.2,
         AttackEnhancement.JAILBREAK_CRESCENDO: 0.2,
@@ -45,10 +45,10 @@ results = red_teamer.scan(
 ```
 
 :::tip DID YOU KNOW?
-`deepeval` offers **10 types of attack enhancements**, which are randomly sampled from the specified distribution each time an attack is enhanced.
+`deepteam` offers **10 types of attack enhancements**, which are randomly sampled from the specified distribution each time an attack is enhanced.
 :::
 
-Here are the `AttackEnhancement`s `deepeval` offers:
+Here are the `AttackEnhancement`s `deepteam` offers:
 
 | Attack Enhancement                      | Description                                                                                                                                                        |
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -65,7 +65,7 @@ Here are the `AttackEnhancement`s `deepeval` offers:
 
 ## Attack Enhancement Types
 
-`deepeval`'s `AttackEnhancement`s are categorized into three types: **encoding-based, one-shot, and dialogue-based enhancements**.
+`deepteam`'s `AttackEnhancement`s are categorized into three types: **encoding-based, one-shot, and dialogue-based enhancements**.
 
 <div
   style={{
@@ -75,7 +75,7 @@ Here are the `AttackEnhancement`s `deepeval` offers:
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_overview.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_overview.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
@@ -90,7 +90,7 @@ Encoding-based attack enhancements apply simple encoding techniques, such as cha
 
 ## Encoding-based Enhancements
 
-`deepeval` supports multiple encoding-based attack enhancements that work by transforming the baseline attack using different encoding or encryption techniques. These enhancements are designed to obscure the content of the attack, making it more difficult for content filters to detect harmful intent. Encoding-based attacks leverage techniques like text rotation, character substitution, or encoding schemes to alter the visible content while retaining its malicious meaning.
+`deepteam` supports multiple encoding-based attack enhancements that work by transforming the baseline attack using different encoding or encryption techniques. These enhancements are designed to obscure the content of the attack, making it more difficult for content filters to detect harmful intent. Encoding-based attacks leverage techniques like text rotation, character substitution, or encoding schemes to alter the visible content while retaining its malicious meaning.
 
 <div
   style={{
@@ -100,7 +100,7 @@ Encoding-based attack enhancements apply simple encoding techniques, such as cha
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_encoding.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_encoding.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
@@ -159,7 +159,7 @@ One-shot attack enhancements utilize an LLM to creatively **modify the baseline 
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_one_shot.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_one_shot.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
@@ -215,7 +215,7 @@ Dialogue-based enhancements involve interactive methods where the attack is **re
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_dialogue.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_dialogue.svg"
     alt="LangChain"
     style={{
       margin: "40px",
@@ -241,7 +241,7 @@ Linear Jailbreaking uses a step-by-step progression, building on each LLM respon
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_jailbreaking_overview.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_jailbreaking_overview.svg"
     alt="LangChain"
     style={{
       margin: "40px",
@@ -263,7 +263,7 @@ Linear Jailbreaking follows a systematic progression, where each new attack buil
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_jailbreaking_linear.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_jailbreaking_linear.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
@@ -290,7 +290,7 @@ Tree Jailbreaking explores **multiple paths simultaneously**, with each branch r
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_jailbreaking_tree.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_jailbreaking_tree.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
@@ -319,7 +319,7 @@ Crescendo Jailbreaking starts with neutral or benign queries and slowly escalate
   }}
 >
   <img
-    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_jailbreaking_crescendo.svg"
+    src="https://confident-bucket.s3.amazonaws.com/attack_methods_jailbreaking_crescendo.svg"
     alt="LangChain"
     style={{
       marginTop: "20px",
