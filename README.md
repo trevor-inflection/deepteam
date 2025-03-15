@@ -73,6 +73,8 @@ DeepTeam runs **locally on your machine**, and can be used with any LLM for red 
 - Easily access red teaming risk assessments, display in dataframes, and **save locally on your machine in JSON format.**
 - Out of the box support for standard guidelines such as OWASP Top 10 for LLMs, NIST AI RMF.
 
+<br />
+
 # 🚀 QuickStart
 
 DeepTeam does not require you to define what LLM system you are red teaming because neither will malicious users/bad actors. All you need to do is to install `deepteam`, define a `model_callback`, and you're good to go.
