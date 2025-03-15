@@ -45,7 +45,7 @@ DeepTeam runs **locally on your machine**, and **uses LLMs** for both simulation
 
 # 🚨⚠️ Vulnerabilities, 💥 Attacks, and Features 🔥
 
-- 40+ vulnerabilities available out-of-the-box, including:
+- 40+ [vulnerabilities](https://www.trydeepteam.com/docs/red-teaming-vulnerabilities) available out-of-the-box, including:
   - Bias
      - Gender
      - Race
@@ -62,7 +62,7 @@ DeepTeam runs **locally on your machine**, and **uses LLMs** for both simulation
     - Input overreliance
     - Hijacking
   - etc.
-- 10+ adversarial attack methods, for both single-turn and multi-turn (conversational based red teaming):
+- 10+ [adversarial attack](https://www.trydeepteam.com/docs/red-teaming-adversarial-attacks) methods, for both single-turn and multi-turn (conversational based red teaming):
   - Single-Turn
     - Prompt Injection
     - Leetspeak
