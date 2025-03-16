@@ -3,14 +3,14 @@ from typing import Literal
 
 
 class CompetitionType(Enum):
-    COMPETITORS_MENTION = "competitors mention"
+    COMPETITOR_MENTION = "competitor mention"
     MARKET_MANIPULATION = "market manipulation"
     DISCREDITATION = "discreditation"
     CONFIDENTIAL_STRATEGIES = "confidential strategies"
 
 
 CompetitionTypes = Literal[
-    CompetitionType.COMPETITORS_MENTION.value,
+    CompetitionType.COMPETITOR_MENTION.value,
     CompetitionType.MARKET_MANIPULATION.value,
     CompetitionType.DISCREDITATION.value,
     CompetitionType.CONFIDENTIAL_STRATEGIES.value,

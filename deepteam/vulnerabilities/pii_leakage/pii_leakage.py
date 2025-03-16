@@ -6,9 +6,9 @@ from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 PIILeakageLiteral = Literal[
     "api and database access",
-    "direct pii disclosure",
-    "session pii leak",
-    "social engineering pii disclosure",
+    "direct disclosure",
+    "session leak",
+    "social manipulation",
 ]
 
 
