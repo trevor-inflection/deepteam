@@ -5,7 +5,10 @@ from deepteam.vulnerabilities.prompt_leakage import PromptLeakageType
 from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 PromptLeakageLiteral = Literal[
-    "secrets and credentials", "instructions", "guards", "permissions and roles"
+    "secrets and credentials",
+    "instructions",
+    "guard exposure",
+    "permissions and roles",
 ]
 
 

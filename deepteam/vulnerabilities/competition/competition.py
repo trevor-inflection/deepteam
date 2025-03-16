@@ -6,7 +6,7 @@ from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 
 CompetitionLiteralType = Literal[
-    "competitors mention",
+    "competitor mention",
     "market manipulation",
     "discreditation",
     "confidential strategies",

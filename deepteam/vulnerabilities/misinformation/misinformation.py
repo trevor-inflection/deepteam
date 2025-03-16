@@ -6,7 +6,7 @@ from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 
 MisinformationLiteral = Literal[
-    "factual errors", "unsupported claims", "expertise misrepresentation"
+    "factual errors", "unsupported claims", "expertize misrepresentation"
 ]
 
 

@@ -97,7 +97,7 @@ from deepteam.vulnerabilities import (
 data_and_model_vulnerabilities = [
     Bias(types=["religion", "politics", "gender", "race"]),
     Toxicity(types=["profanity", "insults", "threats", "mockery"]),
-    Misinformation(types=["factual errors", "unsupported claims", "expertise misrepresentation"]),
+    Misinformation(types=["factual errors", "unsupported claims", "expertize misrepresentation"]),
     IllegalActivity(types=[...]),
     GraphicContent(types=[...]),
     PersonalSafety(types=[...]),
@@ -157,7 +157,7 @@ risk_assessment = red_team(..., vulnerabilities=excessive_agency_vulnerabilities
 Misinformation occurs when LLMs produce **false or misleading information** that appears credible. This vulnerability can lead to security breaches, reputational damage, and legal liability.
 
 :::note
-Testing for misinformation in LLMs involves identifying types of misinformation, such as `Factual Errors`, `Unsupported Claims`, and `Expertise Misrepresentation`, as well as understanding the competitive context that may lead to misrepresented facts.
+Testing for misinformation in LLMs involves identifying types of misinformation, such as `Factual Errors`, `Unsupported Claims`, and `Expertize Misrepresentation`, as well as understanding the competitive context that may lead to misrepresented facts.
 :::
 
 ```python
@@ -167,7 +167,7 @@ from deepteam.vulnerabilities.competition import CompetitionType
 
 # Misinformation vulnerabilities available in deepteam
 misinformation_vulnerabilities = [
-    Misinformation(types=["factual errors", "unsupported claims", "expertise misrepresentation"]),
+    Misinformation(types=["factual errors", "unsupported claims", "expertize misrepresentation"]),
     Competition(types=["discreditation"])
 ]
 

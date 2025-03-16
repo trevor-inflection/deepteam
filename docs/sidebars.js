@@ -90,7 +90,7 @@ module.exports = {
               type: "category",
               label: "Illegal Risks",
               items: [
-                "red-teaming-vulnerabilities-illegal-activities",
+                "red-teaming-vulnerabilities-illegal-activity",
                 "red-teaming-vulnerabilities-graphic-content",
                 "red-teaming-vulnerabilities-personal-safety",
               ],
