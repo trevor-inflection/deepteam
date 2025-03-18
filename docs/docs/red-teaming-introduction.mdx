@@ -497,12 +497,12 @@ risk_assessment = red_teamer.red_team(model_callback=model_callback, reuse_previ
 
 The red teaming process consists of 2 main steps:
 
-- **Generating Adversarial Attacks** to elicit unsafe LLM responses
-- **Evaluating Target LLM Responses** to these attacks
+- **Simulating Adversarial Attacks** to elicit unsafe LLM responses
+- **Evaluating LLM Outputs** to these attacks
 
 The generated attacks are fed to the target LLM as queries, and the resulting LLM responses are evaluated and scored to assess the LLM's vulnerabilities.
 
-### Generating Adversarial Attacks
+### Simulating Adversarial Attacks
 
 Attacks generation can be broken down into 2 key stages:
 
@@ -529,7 +529,7 @@ During this step, baseline attacks are synthetically generated based on user-spe
   />
 </div>
 
-### Evaluating Target LLM Responses
+### Evaluating LLM Outputs
 
 The response evaluation process also involves two key stages:
 
