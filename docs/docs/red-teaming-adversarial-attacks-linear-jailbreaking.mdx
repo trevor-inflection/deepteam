@@ -4,4 +4,35 @@ title: Linear Jailbreaking
 sidebar_label: Linear Jailbreaking
 ---
 
-_To be documented..._
+Linear Jailbreaking follows a systematic progression, where each new attack builds directly on the previous response from the LLM. The process involves **iterating through increasingly persuasive attacks**, gradually pushing the boundaries of the model's restrictions. At each stage, the enhanced attack is evaluated, and adjustments are made based on the model’s feedback. The goal is to lead the LLM towards generating harmful outputs while ensuring that each step builds on the previous one to maintain a logical flow.
+
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <img
+    src="https://confident-bucket.s3.amazonaws.com/attack_enhancements_jailbreaking_linear.svg"
+    alt="LangChain"
+    style={{
+      marginTop: "20px",
+      marginBottom: "40px",
+      height: "auto",
+      maxHeight: "500px",
+    }}
+  />
+</div>
+
+:::info
+The process continues until the attacker LLM generates a **non-compliant attack** or **the maximum number of iterations** is reached.
+:::
+
+## Usage
+
+_to be documented..._
+
+## Example
+
+_to be documented..._
