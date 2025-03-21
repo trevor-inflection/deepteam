@@ -404,7 +404,7 @@ There are **THREE** mandatory and **FOUR** optional arguments when calling the `
 - `attacks`: a list of type `BaseAttack`s that determines the methods that will be simulated to expose the defined `vulnerabilities`.
 - [Optional] `attacks_per_vulnerability_type`: an int that determines the number of attacks to be simulated per vulnerability type. Defaulted to `1`.
 - [Optional] `ignore_errors`: a boolean which when set to `True`, ignores all exceptions raised during red teaming. Defaulted to `False`.
-- [Optional] `run_async`: a boolean which when set to `True`, enables concurrent red teaming on all vulnerabilities, attacks, generations, **AND** evaluations. Defaulted to `True`.
+- [Optional] `run_async`: a boolean which when set to `True`, enables concurrent red teaming on all vulnerabilities, attacks, generations, **AND** evaluations. Defaulted to `False`.
 - [Optional] `max_concurrent`: an integer that determines the maximum number of coroutines that can be ran in parallel. You can decrease this value if your models are running into rate limit errors. Defaulted to `10`.
 
 Don't forget to save the results (or at least print it):
@@ -475,14 +475,13 @@ print(risk_assessment.overall)
 As explained in the adversarial attack section, by making the PromptInjection attack `weight` 2x that of the `weight` of `ROT13`, it now has a 2x more chance to be simulated.
 :::
 
-There are **THREE** mandatory and **FOUR** optional arguments when calling the `red_team()` function:
+There are **THREE** mandatory and **FOUR** optional arguments when calling the `red_team()` method:
 
 - `model_callback`: a callback of type `Callable[[str], str]` that wraps around the target LLM system you wish to red team.
 - `vulnerabilities`: a list of type `BaseVulnerability`s that determines the weaknesses to detect for.
 - `attacks`: a list of type `BaseAttack`s that determines the methods that will be simulated to expose the defined `vulnerabilities`.
 - [Optional] `attacks_per_vulnerability_type`: an int that determines the number of attacks to be simulated per vulnerability type. Defaulted to `1`.
 - [Optional] `ignore_errors`: a boolean which when set to `True`, ignores all exceptions raised during red teaming. Defaulted to `False`.
-- [Optional] `run_async`: a boolean which when set to `True`, enables concurrent red teaming on all vulnerabilities, attacks, generations, **AND** evaluations. Defaulted to `True`.
 - [Optional] `reuse_previous_attacks`: a boolean which when set to `True`, will reuse the previously simulated attacks from the last `red_team()` method run. These attacks can only be reused if they exist (i.e. if you have already ran `red_team()` at least once). Defaulted to `False`.
 
 You'll notice that the `RedTeamer` since it is stateful, allows you to `reuse_previous_attacks`, which is not possible by the standalone `red_team()` function.
