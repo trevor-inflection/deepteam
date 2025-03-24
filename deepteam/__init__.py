@@ -24,13 +24,13 @@ def check_for_update():
 
         try:
             response = requests.get(
-                "https://pypi.org/pypi/deepeval/json", timeout=5
+                "https://pypi.org/pypi/deepteam/json", timeout=5
             )
             latest_version = response.json()["info"]["version"]
 
             if compare_versions(latest_version, __version__):
                 warnings.warn(
-                    f'You are using deepeval version {__version__}, however version {latest_version} is available. You should consider upgrading via the "pip install --upgrade deepeval" command.'
+                    f'You are using deepteam version {__version__}, however version {latest_version} is available. You should consider upgrading via the "pip install --upgrade deepteam" command.'
                 )
         except (
             requests.exceptions.RequestException,
