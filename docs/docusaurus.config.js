@@ -59,7 +59,7 @@ module.exports = {
     {
       src: "https://plausible.io/js/script.tagged-events.js",
       defer: true,
-      "data-domain": "confident-ai.com",
+      "data-domain": "trydeepteam.com",
     },
   ],
   stylesheets: [
