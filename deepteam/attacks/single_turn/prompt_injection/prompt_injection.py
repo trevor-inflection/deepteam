@@ -11,7 +11,6 @@ class PromptInjection(BaseAttack):
         self.weight = weight
 
     def enhance(self, attack: str) -> str:
-        """Enhance the attack input using prompt injection techniques."""
         return random.choice(
             [
                 PromptInjectionTemplate.enhance_1(attack),

@@ -14,9 +14,10 @@ from deepteam.attacks.single_turn import GrayBox
 gray_box = GrayBox()
 ```
 
-There are **ONE** optional parameters when creating a `GrayBox` attack:
+There are **TWO** optional parameters when creating a `GrayBox` attack:
 
 - [Optional] `weight`: an integer that determines this attack method's selection probability, proportional to the total weight sum of all `attacks` during red teaming. Defaulted to `1`.
+- [Optional] `max_retries`: an integer that specifies the number of times to retry simulating a `GrayBox` attack for any error that occurs. Defaulted to `5`.
 
 To use the `GrayBox` attack method, supply it to the `red_team()` method:
 

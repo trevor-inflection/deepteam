@@ -50,12 +50,10 @@ class CrescendoJailbreaking(BaseAttack):
 
     def __init__(
         self,
-        model_callback: CallbackType,
         weight: int = 1,
         max_rounds: int = 10,
         max_backtracks: int = 10,
     ):
-        self.model_callback = model_callback
         self.weight = weight
 
         self.memory = MemorySystem()
@@ -64,8 +62,14 @@ class CrescendoJailbreaking(BaseAttack):
         self.max_rounds = max_rounds
         self.max_backtracks = max_backtracks
 
-    def enhance(self, attack: str, simulator_model: DeepEvalBaseLLM) -> str:
+    def enhance(
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
+    ) -> str:
         self.simulator_model = simulator_model
+        self.model_callback = model_callback
 
         round_num = 0
         backtrack_count = 0
@@ -144,9 +148,13 @@ class CrescendoJailbreaking(BaseAttack):
         return enhanced_attack
 
     async def a_enhance(
-        self, attack: str, simulator_model: DeepEvalBaseLLM
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
     ) -> str:
         self.simulator_model = simulator_model
+        self.model_callback = model_callback
 
         round_num = 0
         backtrack_count = 0
