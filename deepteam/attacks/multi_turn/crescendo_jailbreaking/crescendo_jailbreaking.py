@@ -51,15 +51,11 @@ class CrescendoJailbreaking(BaseAttack):
     def __init__(
         self,
         model_callback: CallbackType,
-        simulator_model: DeepEvalBaseLLM,
-        using_native_model: bool,
         weight: int = 1,
         max_rounds: int = 10,
         max_backtracks: int = 10,
     ):
         self.model_callback = model_callback
-        self.simulator_model = simulator_model
-        self.using_native_model = using_native_model
         self.weight = weight
 
         self.memory = MemorySystem()
@@ -68,11 +64,9 @@ class CrescendoJailbreaking(BaseAttack):
         self.max_rounds = max_rounds
         self.max_backtracks = max_backtracks
 
-    ##################################################
-    ### Enhance ######################################
-    ##################################################
+    def enhance(self, attack: str, simulator_model: DeepEvalBaseLLM) -> str:
+        self.simulator_model = simulator_model
 
-    def enhance(self, attack: str) -> str:
         round_num = 0
         backtrack_count = 0
         last_response = ""
@@ -150,8 +144,10 @@ class CrescendoJailbreaking(BaseAttack):
         return enhanced_attack
 
     async def a_enhance(
-        self, attack: str, max_rounds: int = 10, max_backtracks: int = 10
+        self, attack: str, simulator_model: DeepEvalBaseLLM
     ) -> str:
+        self.simulator_model = simulator_model
+
         round_num = 0
         backtrack_count = 0
         last_response = ""
@@ -161,7 +157,7 @@ class CrescendoJailbreaking(BaseAttack):
         system_prompt = JailBreakingCrescendoTemplate.crescendo_system_prompt(
             conversation_objective=attack,
             current_round=round_num + 1,
-            max_rounds=max_rounds,
+            max_rounds=self.max_rounds,
         )
         self.memory.add_message(
             self.red_teaming_chat_conversation_id,
@@ -169,19 +165,19 @@ class CrescendoJailbreaking(BaseAttack):
         )
 
         pbar_rounds = tqdm(
-            total=max_rounds * 4,
+            total=self.max_rounds * 4,
             desc="...... 🎺 Crescendo Jailbreaking: Rounds",
             leave=False,
         )
 
         # Inner progress bar: Tracks the number of backtracks
         pbar_backtracks = tqdm(
-            total=max_backtracks,
+            total=self.max_backtracks,
             desc="...... 🎺 Crescendo Jailbreaking: BackTracking",
             leave=False,
         )
 
-        while round_num < max_rounds:
+        while round_num < self.max_rounds:
             round_num += 1
             enhanced_attack = await self.a_generate_attack(
                 round_num, eval_flag, last_response
@@ -212,11 +208,11 @@ class CrescendoJailbreaking(BaseAttack):
                 )
                 eval_flag = False
                 eval_percentage = None
-                if backtrack_count < max_backtracks:
+                if backtrack_count < self.max_backtracks:
                     round_num -= 1
                     pbar_rounds.update(-3)
                     pbar_backtracks.update(1)
-                if backtrack_count >= max_backtracks:
+                if backtrack_count >= self.max_backtracks:
                     break
                 continue
 
@@ -405,13 +401,11 @@ class CrescendoJailbreaking(BaseAttack):
     ##################################################
 
     def _generate_schema(self, prompt: str, schema: BaseModel):
-        return generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
-        )
+        return generate_schema(prompt, schema, False, self.simulator_model)
 
     async def _a_generate_schema(self, prompt: str, schema: BaseModel):
         return await a_generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
+            prompt, schema, False, self.simulator_model
         )
 
     def get_name(self) -> str:
