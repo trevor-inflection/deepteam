@@ -31,7 +31,25 @@ The process continues until the attacker LLM generates a **non-compliant attack*
 
 ## Usage
 
-_to be documented..._
+```python
+from deepteam.attacks.multi_turn import LinearJailbreaking
+
+linear_jailbreaking = LinearJailbreaking()
+```
+
+There are **TWO** optional parameters when creating a `LinearJailbreaking` attack:
+
+- [Optional] `weight`: an integer that determines this attack method's selection probability, proportional to the total weight sum of all `attacks` during red teaming. Defaulted to `1`.
+- [Optional] `turns`: an integer that specifies the number of turns to use in attempt to jailbreak your LLM system. Defaulted to `5`.
+
+To use the `LinearJailbreaking` attack method, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(attacks=[linear_jailbreaking], model_callback=..., vulnerabilities=...)
+```
 
 ## Example
 
