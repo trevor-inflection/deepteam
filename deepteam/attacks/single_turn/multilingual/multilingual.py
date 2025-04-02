@@ -20,33 +20,22 @@ from deepteam.attacks.attack_simulator.utils import (
 
 
 class Multilingual(BaseAttack):
-    def __init__(
-        self,
-        simulator_model: DeepEvalBaseLLM,
-        using_native_model: bool,
-        weight: int = 1,
-    ):
-
-        self.simulator_model = simulator_model
-        self.using_native_model = using_native_model
+    def __init__(self, weight: int = 1, max_retries: int = 5):
         self.weight = weight
+        self.max_retries = max_retries
 
-    ##################################################
-    ### Sync Multilingual Attack - enhance ###########
-    ##################################################
-
-    def enhance(self, attack: str, max_retries: int = 5) -> str:
-        """Enhance the prompt by translating it to multiple languages synchronously with compliance checking."""
+    def enhance(self, attack: str, simulator_model: DeepEvalBaseLLM) -> str:
+        self.simulator_model = simulator_model
         prompt = MultilingualTemplate.enhance(attack)
 
         # Progress bar for retries (total count is double the retries: 1 for generation, 1 for compliance check)
         with tqdm(
-            total=max_retries * 3,
+            total=self.max_retries * 3,
             desc="...... 🌍 Multilingual Enhancement",
             unit="step",
             leave=False,
         ) as pbar:
-            for _ in range(max_retries):
+            for _ in range(self.max_retries):
                 # Generate the enhanced prompt
                 res: EnhancedAttack = self._generate_schema(
                     prompt, EnhancedAttack
@@ -82,24 +71,22 @@ class Multilingual(BaseAttack):
         # If all retries fail, return the original prompt
         return attack
 
-    ##################################################
-    ### Async Multilingual Attack - a_enhance ########
-    ##################################################
-
-    async def a_enhance(self, attack: str, max_retries: int = 5) -> str:
-        """Enhance the prompt by translating it to multiple languages asynchronously with compliance checking."""
+    async def a_enhance(
+        self, attack: str, simulator_model: DeepEvalBaseLLM
+    ) -> str:
+        self.simulator_model = simulator_model
         prompt = MultilingualTemplate.enhance(attack)
 
         # Async progress bar for retries (double the count to cover both generation and compliance check)
         pbar = async_tqdm_bar(
-            total=max_retries * 3,
+            total=self.max_retries * 3,
             desc="...... 🌍 Multilingual Enhancement",
             unit="step",
             leave=False,
         )
 
         try:
-            for _ in range(max_retries):
+            for _ in range(self.max_retries):
                 # Generate the enhanced prompt asynchronously
                 res: EnhancedAttack = await self._a_generate_schema(
                     prompt, EnhancedAttack
@@ -146,15 +133,11 @@ class Multilingual(BaseAttack):
     ##################################################
 
     def _generate_schema(self, prompt: str, schema: BaseModel):
-        """Helper method to generate the schema synchronously."""
-        return generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
-        )
+        return generate_schema(prompt, schema, False, self.simulator_model)
 
     async def _a_generate_schema(self, prompt: str, schema: BaseModel):
-        """Helper method to generate the schema asynchronously."""
         return await a_generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
+            prompt, schema, False, self.simulator_model
         )
 
     def get_name(self) -> str:

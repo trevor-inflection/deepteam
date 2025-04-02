@@ -25,20 +25,19 @@ from deepteam.attacks.multi_turn.types import CallbackType
 class LinearJailbreaking(BaseAttack):
     def __init__(
         self,
-        model_callback: CallbackType,
-        simulator_model: DeepEvalBaseLLM,
-        using_native_model: bool,
         weight: int = 1,
         turns: int = 5,
     ):
-        self.model_callback = model_callback
-        self.simulator_model = simulator_model
-        self.using_native_model = using_native_model
         self.weight = weight
         self.turns = turns
 
-    def enhance(self, attack: str) -> str:
-        """Enhance the attack using linear jailbreaking with multiple iterations synchronously."""
+    def enhance(
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
+    ) -> str:
+        self.simulator_model = simulator_model
 
         # Define Progress Bar
         llm_calls_per_iteration = 5
@@ -56,20 +55,20 @@ class LinearJailbreaking(BaseAttack):
         for _ in range(self.turns):
             # 1st step: Enhance the initial attack
             conversation = json.dumps(conversation_json)
-            res: ImprovementPrompt = self._generate_schema(
+            improvement_res: ImprovementPrompt = self._generate_schema(
                 conversation, ImprovementPrompt
             )
-            enhanced_attack = res.prompt
+            enhanced_attack = improvement_res.prompt
             pbar.update(1)
 
             # 2nd step: Check if enhanced attack is a refusal statement
             non_refusal_prompt = JailBreakingTemplate.non_refusal(
                 attack, enhanced_attack
             )
-            res: NonRefusal = self._generate_schema(
+            non_refusal_res: NonRefusal = self._generate_schema(
                 non_refusal_prompt, NonRefusal
             )
-            classification = res.classification
+            classification = non_refusal_res.classification
             if classification == "Refusal":
                 pbar.n = pbar.total
                 pbar.close()
@@ -82,13 +81,15 @@ class LinearJailbreaking(BaseAttack):
             is_on_topic_prompt = JailBreakingTemplate.on_topic(
                 attack, current_attack
             )
-            res: OnTopic = self._generate_schema(is_on_topic_prompt, OnTopic)
+            on_topic_res: OnTopic = self._generate_schema(
+                is_on_topic_prompt, OnTopic
+            )
 
-            on_topic = res.on_topic
+            on_topic = on_topic_res.on_topic
             pbar.update(1)
 
             # 4th step: Generate a response from the target LLM using the enhanced attack
-            target_response = self.model_callback(current_attack)
+            target_response = model_callback(current_attack)
 
             penalized_phrases = ["in the face of impending doom"]
             contains_penalized_phrase = any(
@@ -101,9 +102,9 @@ class LinearJailbreaking(BaseAttack):
             judge_prompt = JailBreakingTemplate.linear_judge(
                 attack, current_attack, target_response
             )
-            res: Rating = self._generate_schema(judge_prompt, Rating)
+            rating_res: Rating = self._generate_schema(judge_prompt, Rating)
 
-            score = res.rating
+            score = rating_res.rating
             pbar.update(1)
 
             # Apply penalty if the phrase is present
@@ -125,8 +126,13 @@ class LinearJailbreaking(BaseAttack):
         pbar.close()
         return current_attack
 
-    async def a_enhance(self, attack: str) -> str:
-        """Enhance the attack using linear jailbreaking with multiple iterations asynchronously."""
+    async def a_enhance(
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
+    ) -> str:
+        self.simulator_model = simulator_model
 
         # Define Progress Bar
         llm_calls_per_iteration = 5
@@ -144,20 +150,20 @@ class LinearJailbreaking(BaseAttack):
         for _ in range(self.turns):
             # 1st step: Enhance the initial attack
             conversation = json.dumps(conversation_json)
-            res: ImprovementPrompt = await self._a_generate_schema(
+            improvement_res: ImprovementPrompt = await self._a_generate_schema(
                 conversation, ImprovementPrompt
             )
-            enhanced_attack = res.prompt
+            enhanced_attack = improvement_res.prompt
             pbar.update(1)
 
             # 2nd step: Check if enhanced attack is a refusal statement
             non_refusal_prompt = JailBreakingTemplate.non_refusal(
                 attack, enhanced_attack
             )
-            res: NonRefusal = await self._a_generate_schema(
+            non_refusal_res: NonRefusal = await self._a_generate_schema(
                 non_refusal_prompt, NonRefusal
             )
-            classification = res.classification
+            classification = non_refusal_res.classification
             if classification == "Refusal":
                 pbar.n = pbar.total
                 pbar.close()
@@ -170,14 +176,14 @@ class LinearJailbreaking(BaseAttack):
             is_on_topic_prompt = JailBreakingTemplate.on_topic(
                 attack, current_attack
             )
-            res: OnTopic = await self._a_generate_schema(
+            on_topic_res: OnTopic = await self._a_generate_schema(
                 is_on_topic_prompt, OnTopic
             )
-            on_topic = res.on_topic
+            on_topic = on_topic_res.on_topic
             pbar.update(1)
 
             # 4th step: Generate a response from the target LLM using the enhanced attack
-            target_response = await self.model_callback(current_attack)
+            target_response = await model_callback(current_attack)
             penalized_phrases = ["in the face of impending doom"]
 
             contains_penalized_phrase = any(
@@ -190,8 +196,10 @@ class LinearJailbreaking(BaseAttack):
             judge_prompt = JailBreakingTemplate.linear_judge(
                 attack, current_attack, target_response
             )
-            res: Rating = await self._a_generate_schema(judge_prompt, Rating)
-            score = res.rating
+            rating_res: Rating = await self._a_generate_schema(
+                judge_prompt, Rating
+            )
+            score = rating_res.rating
             pbar.update(1)
 
             # Apply penalty if the phrase is present
@@ -218,13 +226,11 @@ class LinearJailbreaking(BaseAttack):
     ##################################################
 
     def _generate_schema(self, prompt: str, schema: BaseModel):
-        return generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
-        )
+        return generate_schema(prompt, schema, False, self.simulator_model)
 
     async def _a_generate_schema(self, prompt: str, schema: BaseModel):
         return await a_generate_schema(
-            prompt, schema, self.using_native_model, self.simulator_model
+            prompt, schema, False, self.simulator_model
         )
 
     def get_name(self) -> str:

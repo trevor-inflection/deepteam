@@ -39,22 +39,19 @@ class TreeJailbreaking(BaseAttack):
 
     def __init__(
         self,
-        model_callback: CallbackType,
-        simulator_model: DeepEvalBaseLLM,
-        using_native_model: bool,
         weight: int = 1,
     ):
-        self.model_callback = model_callback
-        self.simulator_model = simulator_model
-        self.using_native_model = using_native_model
         self.weight = weight
 
-    ##################################################
-    ### Sync Jailbreaking - enhance ##################
-    ##################################################
+    def enhance(
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
+    ) -> str:
+        self.simulator_model = simulator_model
+        self.model_callback = model_callback
 
-    def enhance(self, attack: str) -> str:
-        """Enhance the attack using tree-based jailbreaking synchronously."""
         MAX_RUNTIME = 50.0  # Time limit in seconds
         root = TreeNode(prompt=attack, score=0, depth=0)
         start_time = time.time()
@@ -170,12 +167,15 @@ class TreeJailbreaking(BaseAttack):
             )
             node.children.append(child_node)
 
-    ##################################################
-    ### Async Jailbreaking - a_enhance ###############
-    ##################################################
+    async def a_enhance(
+        self,
+        attack: str,
+        model_callback: CallbackType,
+        simulator_model: DeepEvalBaseLLM,
+    ) -> str:
+        self.model_callback = model_callback
+        self.simulator_model = simulator_model
 
-    async def a_enhance(self, attack: str, *args, **kwargs) -> str:
-        """Enhance the attack using tree-based jailbreaking asynchronously."""
         MAX_RUNTIME = 50.0  # Time limit in seconds
         root = TreeNode(prompt=attack, score=0, depth=0)
         start_time = time.time()
