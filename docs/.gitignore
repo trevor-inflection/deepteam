@@ -43,3 +43,8 @@ website/i18n/**/*
 #!website/i18n/fr/**/*
 
 .netlify
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class

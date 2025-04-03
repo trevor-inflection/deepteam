@@ -1,16 +1,17 @@
 from pydantic import BaseModel
 from .schema import SyntheticData, SyntheticDataList
 
-from deepeval.metrics.utils import trimAndLoadJson
+from deepeval.metrics.utils import trimAndLoadJson, initialize_model
 from deepeval.models import DeepEvalBaseLLM
 
 
 def generate_schema(
     prompt: str,
     schema: BaseModel,
-    using_native_model: bool,
     model: DeepEvalBaseLLM,
 ) -> BaseModel:
+    _, using_native_model = initialize_model(model=model)
+
     if using_native_model:
         res, _ = model.generate(prompt, schema=schema)
         return res
@@ -31,9 +32,10 @@ def generate_schema(
 async def a_generate_schema(
     prompt: str,
     schema: BaseModel,
-    using_native_model: bool,
     model: DeepEvalBaseLLM,
 ) -> BaseModel:
+    _, using_native_model = initialize_model(model=model)
+
     if using_native_model:
         res, _ = await model.a_generate(prompt, schema=schema)
         return res
