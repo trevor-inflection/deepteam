@@ -1,6 +1,7 @@
 from deepteam import red_team
 from deepteam.vulnerabilities import *
 from deepteam.attacks.single_turn import PromptInjection
+from deepteam.attacks.multi_turn import LinearJailbreaking
 
 
 def model_callback(input: str) -> str:
@@ -10,36 +11,39 @@ def model_callback(input: str) -> str:
 
 pii_leakage = PIILeakage(
     types=[
-        # "direct disclosure",
+        "direct disclosure",
         "api and database access",
-        # "session leak",
-        # "social manipulation",
+        "session leak",
+        "social manipulation",
     ]
 )
 prompt_leakage = PromptLeakage(
     types=[
         "secrets and credentials",
-        # "guard exposure",
+        "guard exposure",
         "instructions",
-        # "permissions and roles",
+        "permissions and roles",
     ]
 )
 
 
 bias = Bias(types=["race", "gender", "politics", "religion"])
 
+# bias = Bias(types=["race"])
+
+
 toxicity = Toxicity(types=["insults", "mockery", "profanity", "threats"])
 
 
 unauthorized_access = UnauthorizedAccess(
     types=[
-        # "rbac",
-        # "bfla",
-        # "bola",
+        "rbac",
+        "bfla",
+        "bola",
         "debug access",
         "shell injection",
         "sql injection",
-        # "ssrf",
+        "ssrf",
     ]
 )
 
@@ -47,7 +51,7 @@ misinformation = Misinformation(
     types=[
         "factual errors",
         "unsupported claims",
-        # "expertize misrepresentation"
+        "expertize misrepresentation",
     ]
 )
 
@@ -60,19 +64,15 @@ intellectual_property = IntellectualProperty(
     ]
 )
 
-# excessive_agency = ExcessiveAgency(
-#     types=[
-#         # "functionality",
-#         # "permissions",
-#         # "autonomy"
-#     ]
-# )
+excessive_agency = ExcessiveAgency(
+    types=["functionality", "permissions", "autonomy"]
+)
 
 robustness = Robustness(types=["hijacking", "input overreliance"])
 
 competition = Competition(
     types=[
-        # "competitor mention",
+        "competitor mention",
         "market manipulation",
         "confidential strategies",
         "discreditation",
@@ -99,29 +99,30 @@ personal_safety = PersonalSafety(
     types=[
         "bullying",
         "dangerous challenges",
-        # "self-harm",
+        "self-harm",
         "stalking",
         "unsafe practices",
     ]
 )
 
 prompt_injection = PromptInjection()
+j = LinearJailbreaking()
 
 red_team(
     model_callback=model_callback,
     vulnerabilities=[
-        # bias,
-        # toxicity,
-        # unauthorized_access,
-        # misinformation,
-        # pii_leakage,
-        # prompt_leakage,
-        # intellectual_property,
-        # excessive_agency,
-        # robustness,
-        # competition,
-        # illegal_activity,
-        # graphic_content,
+        bias,
+        toxicity,
+        unauthorized_access,
+        misinformation,
+        pii_leakage,
+        prompt_leakage,
+        intellectual_property,
+        excessive_agency,
+        robustness,
+        competition,
+        illegal_activity,
+        graphic_content,
         personal_safety,
     ],
     attacks=[prompt_injection],

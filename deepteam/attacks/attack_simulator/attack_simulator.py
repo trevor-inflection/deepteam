@@ -3,12 +3,12 @@ import asyncio
 from tqdm import tqdm
 from pydantic import BaseModel
 from typing import List, Optional, Union
+import inspect
 
 
-from deepeval.metrics.utils import initialize_model
 from deepeval.models import DeepEvalBaseLLM
 from deepeval.confident.api import Api, HttpMethods, Endpoints
-
+from deepeval.metrics.utils import initialize_model
 
 from deepteam.attacks import BaseAttack
 from deepteam.vulnerabilities import BaseVulnerability
@@ -21,6 +21,7 @@ from deepteam.attacks.attack_simulator.api import (
     ApiGenerateBaselineAttack,
     GenerateBaselineAttackResponseData,
 )
+from deepteam.attacks.multi_turn.types import CallbackType
 
 
 class SimulatedAttack(BaseModel):
@@ -37,6 +38,8 @@ BASE_URL = "https://deepeval.confident-ai.com"
 
 
 class AttackSimulator:
+    model_callback: Union[CallbackType, None] = None
+
     def __init__(
         self,
         purpose: str,
@@ -284,8 +287,29 @@ class AttackSimulator:
             return simulated_attack
 
         simulated_attack.attack_method = attack.get_name()
+        sig = inspect.signature(attack.enhance)
         try:
-            simulated_attack.input = attack.enhance(attack_input)
+            if (
+                "simulator_model" in sig.parameters
+                and "model_callback" in sig.parameters
+            ):
+                simulated_attack.input = attack.enhance(
+                    attack=attack_input,
+                    simulator_model=self.simulator_model,
+                    model_callback=self.model_callback,
+                )
+            elif "simulator_model" in sig.parameters:
+                simulated_attack.input = attack.enhance(
+                    attack=attack_input,
+                    simulator_model=self.simulator_model,
+                )
+            elif "model_callback" in sig.parameters:
+                simulated_attack.input = attack.enhance(
+                    attack=attack_input,
+                    model_callback=self.model_callback,
+                )
+            else:
+                simulated_attack.input = attack.enhance(attack=attack_input)
         except:
             if ignore_errors:
                 simulated_attack.error = "Error enhancing attack"
@@ -306,8 +330,31 @@ class AttackSimulator:
             return simulated_attack
 
         simulated_attack.attack_method = attack.get_name()
+        sig = inspect.signature(attack.a_enhance)
         try:
-            simulated_attack.input = await attack.a_enhance(attack_input)
+            if (
+                "simulator_model" in sig.parameters
+                and "model_callback" in sig.parameters
+            ):
+                simulated_attack.input = await attack.a_enhance(
+                    attack=attack_input,
+                    simulator_model=self.simulator_model,
+                    model_callback=self.model_callback,
+                )
+            elif "simulator_model" in sig.parameters:
+                simulated_attack.input = await attack.a_enhance(
+                    attack=attack_input,
+                    simulator_model=self.simulator_model,
+                )
+            elif "model_callback" in sig.parameters:
+                simulated_attack.input = await attack.a_enhance(
+                    attack=attack_input,
+                    model_callback=self.model_callback,
+                )
+            else:
+                simulated_attack.input = await attack.a_enhance(
+                    attack=attack_input
+                )
         except:
             if ignore_errors:
                 simulated_attack.error = "Error enhancing attack"
@@ -346,7 +393,6 @@ class AttackSimulator:
         body = generate_baseline_attack_request.model_dump(
             by_alias=True, exclude_none=True
         )
-        print(body)
         api = Api(base_url=BASE_URL, api_key="NA")
         try:
             # API request
@@ -356,8 +402,6 @@ class AttackSimulator:
                 body=body,
             )
         except Exception as e:
-            print(e)
-            print("!!!")
             raise e
 
         return GenerateBaselineAttackResponseData(**response).baseline_attacks

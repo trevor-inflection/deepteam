@@ -226,12 +226,10 @@ class LinearJailbreaking(BaseAttack):
     ##################################################
 
     def _generate_schema(self, prompt: str, schema: BaseModel):
-        return generate_schema(prompt, schema, False, self.simulator_model)
+        return generate_schema(prompt, schema, self.simulator_model)
 
     async def _a_generate_schema(self, prompt: str, schema: BaseModel):
-        return await a_generate_schema(
-            prompt, schema, False, self.simulator_model
-        )
+        return await a_generate_schema(prompt, schema, self.simulator_model)
 
     def get_name(self) -> str:
         return "Linear Jailbreaking"

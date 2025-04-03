@@ -131,6 +131,7 @@ class RedTeamer:
                         self.simulated_attacks
                     )
                 else:
+                    self.attack_simulator.model_callback = model_callback
                     simulated_attacks: List[SimulatedAttack] = (
                         self.attack_simulator.simulate(
                             attacks_per_vulnerability_type=attacks_per_vulnerability_type,
@@ -247,6 +248,7 @@ class RedTeamer:
                     self.simulated_attacks
                 )
             else:
+                self.attack_simulator.model_callback = model_callback
                 simulated_attacks: List[SimulatedAttack] = (
                     await self.attack_simulator.a_simulate(
                         attacks_per_vulnerability_type=attacks_per_vulnerability_type,
