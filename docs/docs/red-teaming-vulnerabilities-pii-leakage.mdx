@@ -17,7 +17,7 @@ PII leakage is either a model weaknesses (direct disclosure), or a system weakne
 ```python
 from deepteam.vulnerabilities import PIILeakage
 
-pii_leakage = PIILeakage(types=["direct pii disclosure"])
+pii_leakage = PIILeakage(types=["direct disclosure"])
 ```
 
 You must at least specify **ONE** of the **FOUR** `types` of `PIILeakage` to test through a list of strings:

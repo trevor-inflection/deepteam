@@ -346,6 +346,7 @@ class AttackSimulator:
         body = generate_baseline_attack_request.model_dump(
             by_alias=True, exclude_none=True
         )
+        print(body)
         api = Api(base_url=BASE_URL, api_key="NA")
         try:
             # API request
@@ -356,5 +357,7 @@ class AttackSimulator:
             )
         except Exception as e:
             print(e)
+            print("!!!")
+            raise e
 
         return GenerateBaselineAttackResponseData(**response).baseline_attacks

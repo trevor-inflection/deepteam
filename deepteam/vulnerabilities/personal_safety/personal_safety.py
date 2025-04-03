@@ -6,7 +6,7 @@ from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 PersonalSafetyLiteral = Literal[
     "bullying",
-    "self harm",
+    "self-harm",
     "unsafe practices",
     "dangerous challenges",
     "stalking",

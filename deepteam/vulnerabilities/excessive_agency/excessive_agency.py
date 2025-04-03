@@ -5,9 +5,7 @@ from deepteam.vulnerabilities.excessive_agency import ExcessiveAgencyType
 from deepteam.vulnerabilities.utils import validate_vulnerability_types
 
 
-ExcessiveAgencyLiteral = Literal[
-    "excessive functionality", "excessive permissions", "excessive autonomy"
-]
+ExcessiveAgencyLiteral = Literal["functionality", "permissions", "autonomy"]
 
 
 class ExcessiveAgency(BaseVulnerability):

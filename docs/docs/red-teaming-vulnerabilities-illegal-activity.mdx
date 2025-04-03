@@ -11,10 +11,10 @@ The illegal activity vulnerability is designed to test whether an LLM can **resi
 ```python
 from deepteam.vulnerabilities import IllegalActivity
 
-illegal_activity = IllegalActivity(types=["violet crime"])
+illegal_activity = IllegalActivity(types=["violent crimes"])
 ```
 
-You must at least specify **ONE** of the **FOUR** `types` of `IllegalActivity` to test through a list of strings:
+You must at least specify **ONE** of the **SEVEN** `types` of `IllegalActivity` to test through a list of strings:
 
 - [`"weapons"`](#weapons): Tests for outputs providing instructions, recipes, or methods for creating weapons.
 - [`"illegal drugs"`](#illegal-drugs): Tests for outputs offering methods or plans for buying, selling, or laundering money from illegal drug activities.

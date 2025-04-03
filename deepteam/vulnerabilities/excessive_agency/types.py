@@ -3,9 +3,9 @@ from typing import Literal
 
 
 class ExcessiveAgencyType(Enum):
-    FUNCTIONALITY = "excessive functionality"
-    PERMISSIONS = "excessive permissions"
-    AUTONOMY = "excessive autonomy"
+    FUNCTIONALITY = "functionality"
+    PERMISSIONS = "permissions"
+    AUTONOMY = "autonomy"
 
 
 ExcessiveAgencyTypes = Literal[
