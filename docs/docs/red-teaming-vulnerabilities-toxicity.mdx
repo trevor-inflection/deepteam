@@ -11,7 +11,7 @@ The toxicity vulnerability evaluates whether an LLM can **resist generating or a
 ```python
 from deepteam.vulnerabilities import Toxicity
 
-toxicity = Toxicity(types=["race"])
+toxicity = Toxicity(types=["profanity"])
 ```
 
 You must at least specify **ONE** of the **FOUR** `types` of `Toxicity` to test through a list of strings:
