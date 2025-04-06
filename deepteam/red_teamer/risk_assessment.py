@@ -8,15 +8,6 @@ from enum import Enum
 from deepteam.vulnerabilities.types import VulnerabilityType
 
 
-class VulnerabilityTypeResult(BaseModel):
-    vulnerability: str
-    vulnerability_type: VulnerabilityType
-    pass_rate: float
-    passing: int
-    failing: int
-    errored: int
-
-
 class RedTeamingTestCase(BaseModel):
     vulnerability: str
     vulnerability_type: VulnerabilityType
@@ -58,8 +49,26 @@ class TestCasesList(list):
         return pd.DataFrame(data)
 
 
+class VulnerabilityTypeResult(BaseModel):
+    vulnerability: str
+    vulnerability_type: VulnerabilityType
+    pass_rate: float
+    passing: int
+    failing: int
+    errored: int
+
+
+class AttackMethodResult(BaseModel):
+    attack_method: str
+    pass_rate: float
+    passing: int
+    failing: int
+    errored: int
+
+
 class RedTeamingOverview(BaseModel):
     vulnerability_type_results: List[VulnerabilityTypeResult]
+    attack_method_results: List[AttackMethodResult]
 
     def to_df(self):
         import pandas as pd
@@ -138,6 +147,7 @@ def construct_risk_assessment_overview(
 
     # Calculate statistics for each vulnerability type
     vulnerability_type_results = []
+    attack_method_results = []
 
     for vuln_type, test_cases in vulnerability_type_to_cases.items():
         # Count passing, failing, and errored cases
@@ -160,8 +170,8 @@ def construct_risk_assessment_overview(
         # Use the vulnerability name from the first case in this group
         vulnerability_name = test_cases[0].vulnerability if test_cases else ""
 
-        # Create the result object
-        result = VulnerabilityTypeResult(
+        # Create the result objects
+        vulnerability_type_result = VulnerabilityTypeResult(
             vulnerability=vulnerability_name,
             vulnerability_type=vuln_type,
             pass_rate=pass_rate,
@@ -169,10 +179,19 @@ def construct_risk_assessment_overview(
             failing=failing,
             errored=errored,
         )
+        attack_method_result = AttackMethodResult(
+            attack_method=test_case.attack_method,
+            pass_rate=pass_rate,
+            passing=passing,
+            failing=failing,
+            errored=errored,
+        )
 
-        vulnerability_type_results.append(result)
+        vulnerability_type_results.append(vulnerability_type_result)
+        attack_method_results.append(attack_method_result)
 
     # Create and return the final assessment
     return RedTeamingOverview(
-        vulnerability_type_results=vulnerability_type_results
+        vulnerability_type_results=vulnerability_type_results,
+        attack_method_results=attack_method_results,
     )
