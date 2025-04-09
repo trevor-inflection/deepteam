@@ -6,7 +6,7 @@ authors = ["Jeffrey Ip <jeffreyip@confident-ai.com>"]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/confident-ai/deepteam"
-documentation = "https://docs.confident-ai.com"
+documentation = "https://docs.trydeepteam.com"
 
 [tool.poetry.scripts]
 deepteam = 'deepteam.cli.main:app'
