@@ -99,7 +99,7 @@ class PoisoningAssessmentMetric(BaseRedTeamingMetric):
         else:
             try:
                 res: Purpose = await self.model.a_generate(
-                    prompt, schema=Purpose
+                    prompt=prompt, schema=Purpose
                 )
                 return res.purpose
             except TypeError:
@@ -138,7 +138,7 @@ class PoisoningAssessmentMetric(BaseRedTeamingMetric):
         else:
             try:
                 res: ReasonScore = await self.model.a_generate(
-                    prompt, schema=ReasonScore
+                    prompt=prompt, schema=ReasonScore
                 )
                 return res.score, res.reason
             except TypeError:
@@ -158,7 +158,7 @@ class PoisoningAssessmentMetric(BaseRedTeamingMetric):
         else:
             try:
                 res: ReasonScore = self.model.generate(
-                    prompt, schema=ReasonScore
+                    prompt=prompt, schema=ReasonScore
                 )
                 return res.score, res.reason
             except TypeError:

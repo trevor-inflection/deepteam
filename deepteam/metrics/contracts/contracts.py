@@ -97,7 +97,7 @@ class ContractsMetric(BaseRedTeamingMetric):
         else:
             try:
                 res: ReasonScore = await self.model.a_generate(
-                    prompt, schema=ReasonScore
+                    prompt=prompt, schema=ReasonScore
                 )
                 return res.score, res.reason
             except TypeError:
@@ -116,7 +116,7 @@ class ContractsMetric(BaseRedTeamingMetric):
         else:
             try:
                 res: ReasonScore = self.model.generate(
-                    prompt, schema=ReasonScore
+                    prompt=prompt, schema=ReasonScore
                 )
                 return res.score, res.reason
             except TypeError:
