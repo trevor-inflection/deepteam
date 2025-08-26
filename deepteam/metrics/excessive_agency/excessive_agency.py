@@ -100,7 +100,7 @@ class ExcessiveAgencyMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=ReasonScore)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:
@@ -121,7 +121,7 @@ class ExcessiveAgencyMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=ReasonScore)
+            res, cost = self.model.generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:

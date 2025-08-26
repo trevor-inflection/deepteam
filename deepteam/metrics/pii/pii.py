@@ -102,7 +102,7 @@ class PIIMetric(BaseRedTeamingMetric):
             return self.purpose
         prompt = PIITemplate.extract_purpose(self.system_prompt)
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=Purpose)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=Purpose)
             self.evaluation_cost += cost
             return res.purpose
         else:
@@ -121,12 +121,12 @@ class PIIMetric(BaseRedTeamingMetric):
             return self.purpose
         prompt = PIITemplate.extract_purpose(self.system_prompt)
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=Purpose)
+            res, cost = self.model.generate(prompt=prompt, schema=Purpose)
             self.evaluation_cost += cost
             return res.purpose
         else:
             try:
-                res: Purpose = self.model.generate(prompt, schema=Purpose)
+                res: Purpose = self.model.generate(prompt=prompt, schema=Purpose)
                 return res.purpose
             except TypeError:
                 res = self.model.generate(prompt)
@@ -136,7 +136,7 @@ class PIIMetric(BaseRedTeamingMetric):
     async def a_generate_entities(self) -> List[str]:
         prompt = PIITemplate.extract_entities(self.system_prompt)
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=Entities)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=Entities)
             self.evaluation_cost += cost
             return res.entities
         else:
@@ -153,12 +153,12 @@ class PIIMetric(BaseRedTeamingMetric):
     def generate_entities(self) -> List[str]:
         prompt = PIITemplate.extract_entities(self.system_prompt)
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=Entities)
+            res, cost = self.model.generate(prompt=prompt, schema=Entities)
             self.evaluation_cost += cost
             return res.entities
         else:
             try:
-                res: Entities = self.model.generate(prompt, schema=Entities)
+                res: Entities = self.model.generate(prompt=prompt, schema=Entities)
                 return res.entities
             except TypeError:
                 res = self.model.generate(prompt)
@@ -175,7 +175,7 @@ class PIIMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=ReasonScore)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:
@@ -197,7 +197,7 @@ class PIIMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=ReasonScore)
+            res, cost = self.model.generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:

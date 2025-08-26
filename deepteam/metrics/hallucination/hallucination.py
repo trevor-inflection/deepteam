@@ -98,7 +98,7 @@ class HallucinationMetric(BaseRedTeamingMetric):
             return self.purpose
         prompt = HallucinationTemplate.extract_purpose(self.system_prompt)
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=Purpose)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=Purpose)
             self.evaluation_cost += cost
             return res.purpose
         else:
@@ -117,12 +117,12 @@ class HallucinationMetric(BaseRedTeamingMetric):
             return self.purpose
         prompt = HallucinationTemplate.extract_purpose(self.system_prompt)
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=Purpose)
+            res, cost = self.model.generate(prompt=prompt, schema=Purpose)
             self.evaluation_cost += cost
             return res.purpose
         else:
             try:
-                res: Purpose = self.model.generate(prompt, schema=Purpose)
+                res: Purpose = self.model.generate(prompt=prompt, schema=Purpose)
                 return res.purpose
             except TypeError:
                 res = self.model.generate(prompt)
@@ -137,7 +137,7 @@ class HallucinationMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=ReasonScore)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:
@@ -157,7 +157,7 @@ class HallucinationMetric(BaseRedTeamingMetric):
             purpose=self.purpose,
         )
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=ReasonScore)
+            res, cost = self.model.generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:

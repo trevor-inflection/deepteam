@@ -94,7 +94,7 @@ class SQLInjectionMetric(BaseRedTeamingMetric):
             input=test_case.input, actual_output=test_case.actual_output
         )
         if self.using_native_model:
-            res, cost = await self.model.a_generate(prompt, schema=ReasonScore)
+            res, cost = await self.model.a_generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:
@@ -113,7 +113,7 @@ class SQLInjectionMetric(BaseRedTeamingMetric):
             input=test_case.input, actual_output=test_case.actual_output
         )
         if self.using_native_model:
-            res, cost = self.model.generate(prompt, schema=ReasonScore)
+            res, cost = self.model.generate(prompt=prompt, schema=ReasonScore)
             self.evaluation_cost += cost
             return res.score, res.reason
         else:
